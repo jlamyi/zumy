@@ -5,7 +5,6 @@ import time
 
 class GAscent:
     def __init__(self, zumy, xbee):
-        #self.rid = zc_id.get_id()
         self.r = zumy
         self.xb = xbee
 
@@ -61,10 +60,12 @@ class GAscent:
 
         counter = 0
         bestRSSI = 9999
-        time.sleep(20)
+        #time.sleep(20)
+
         while bestRSSI == 9999:
             bestRSSI, rssi_list = xb.get_max_rssi()
             print bestRSSI
+
         print "current bestRSSI: ", bestRSSI
         while bestRSSI < -38:
             bestRSSI, counter = self.calibration(bestRSSI, counter) 
@@ -87,6 +88,5 @@ class GAscent:
         #print self.xb.sendMessage 
         #f.write("Victory!!!")
 
-######## TODO: write another script to test Xbee_driver.py with Class GAscent. Chaining_bot.py can be a reference for this script
         
 

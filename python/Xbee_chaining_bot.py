@@ -1,13 +1,13 @@
 
 import time, threading, serial, zc_id
-from xbee import XBee
+#from xbee import XBee
 from numpy import *
 
-import Xbee_driver
+from Xbee import XbRssi
 
-class Xbee_chiaing_bot(Xbee_driver):
-    def __init__(self, serial_port): 
-        Xbee_driver.__init__(self,serial_port)        
+class Xbee_chaining_bot(XbRssi):
+    def __init__(self,serial_port): 
+        XbRssi.__init__(self,serial_port)        
         self.predecessor = 0
         self.successor = 0
         self.transmit = True
@@ -33,7 +33,7 @@ class Xbee_chiaing_bot(Xbee_driver):
     def decode_msg(self):
         if (self.response != 0):
             msg =  self.data
-            #print msg
+            print msg
             if msg.startswith('TRANSMIT_START'):
                 if (self.predecessor == self.get_sender_id(msg)):
                     self.transmit = True
@@ -44,34 +44,27 @@ class Xbee_chiaing_bot(Xbee_driver):
                 self.transmit = False               
             elif msg.startswith('ASCEND_START'):
                 self.ascend = True
-                #print 'Starting Gradient Ascend'
-                self.send_ack()
-                #self.sendMessage = 'ACK_ASCEND_START'
+                self.sendingCommand = True
+                self.sendMessage = 'ACK'                
             elif msg.startswith('DESCEND_START'):
                 self.descend = True
-                print 'Starting Gradient Descend'
-                self.send_ack()
-  #              self.sendMessage = 'ACK_DESCEND_START'
+                self.sendingCommand = True
+                self.sendMessage = 'ACK'
             elif msg.startswith('ARRIVAL'):
-                self.chain_next_bot(msg)
-                self.send_ack()
-      #          self.sendMessage = 'ACK_ARRIVAL'
+                self.sendingCommand = True
+                self.sendMessage = 'ACK'
             elif msg.startswith('SET_PREDECESSOR'):
                 self.set_predecessor(msg)
                 self.sendMessage = 'ACK_SET_PREDECESSOR'
                 self.send_ack()
-            #elif msg.startswith('ACK'):
-            #    self.sendMessage = 'STOP_ACK'
-            #    self.xbee.tx(dest_addr='\xFF\xFF', data = self.sendMessage)
-            #    self.pktNum = self.pktNum + 1
+            elif msg.startswith('ACK'):
+                self.sendingCommand = True
+                self.sendMessage = 'STOP_ACK'           
             elif msg.startswith('STOP_ACK'):
-                self.sendMessage = ''.join(['Hello #', repr(self.pktNum)] )
-
-            #buff = self.buffer
-            #print buff
-            #self.buffer = buff.append(msg)
-            #print 'a'
-            #print self.serial.read()
+                self.sendingCommand = False
+            else:
+                if self.sendMessage.startswith('STOP_ACK'):
+                    self.sendingCommand = False
 
         else:
             return 0
@@ -176,7 +169,6 @@ class Xbee_chiaing_bot(Xbee_driver):
         while(~msg.startswith('ACK')):
             self.xbee.tx(dest_addr='\xFF\xFF', data = sendmsg)
             self.pktNum = self.pktNum + 1
-            self.receive_pkt()
             msg = self.data
             time.sleep(2)
             print 'waiting_for_ack for' + sendmsg
@@ -188,7 +180,11 @@ class Xbee_chiaing_bot(Xbee_driver):
 
     def send_arrival_signal(self):
         self.sendMessage = 'ARRIVAL-'+str(self.rid)
-        self.send_msg(self.sendMessage)
+        self.sendingCommand = True
+        while(self.sendingCommand == True):
+            print self.data
+            print 'waiting_ack_for_arrival'
+        #self.send_msg(self.sendMessage)
 
     def send_start_transmit_signal(self):
         self.sendMessage = 'TRANSMIT_START-'+str(self.rid)
@@ -204,8 +200,9 @@ class Xbee_chiaing_bot(Xbee_driver):
 
     def send_start_ascend_signal(self):
         self.sendMessage = 'ASCEND_START-'+str(self.rid)
-        msg = self.sendMessage
-        self.send_msg(msg)
+        self.sendingCommand = True
+        while(self.sendingCommand == True):
+            print 'waiting_ack_for_ascend_start'
 
     def end_gradient_ascend(self):
         self.ascend = False

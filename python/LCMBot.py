@@ -21,6 +21,7 @@ class LCMBot:
 			self.stop()
 		finally:
 			self.stop()
+			time.sleep(.1)
 	def drive_in_dist(self, dir, left, right, t):
 		try:
 			if (dir == True):
@@ -33,6 +34,7 @@ class LCMBot:
 			self.stop()
 		finally:
 			self.stop()
+			time.sleep(.1)
 	def stop(self):
 		self.drive(0, 0)
 

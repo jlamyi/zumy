@@ -18,35 +18,41 @@ class XbRssi:
         self.updateTransmitThread.daemon = True
         self.updateReceiveThread = threading.Thread(target=self.receive_loop)
         self.updateReceiveThread.daemon = True
-        self.response = self.xbee.wait_read_frame()
-        self.rssi = -ord(self.response.get('rssi'))
-        self.addr = ord(self.response.get('source_addr')[1])
-        self.data = self.response.get('rf_data')
+        self.response = 0
+        self.rssi = 0
+        self.addr = 0
+        self.data = 0
+        #self.response = self.xbee.wait_read_frame()
+        #self.rssi = -ord(self.response.get('rssi'))
+        #self.addr = ord(self.response.get('source_addr')[1])
+        #self.data = self.response.get('rf_data')
         self.pktNum = 0
-
+        self.sendingCommand = False
         # self.buffer = ['0']
         # self.newest_byte = '0'
-        # self.ser.flush()
+        self.ser.flush()
 
     # define transmit and receive loop
     def transmit_loop(self):
         while True:
             self.transmit_rssi()
-            time.sleep(2)
+            time.sleep(.2)
     def receive_loop(self):
         while True:
             self.response = self.xbee.wait_read_frame()
             self.rssi = -ord(self.response.get('rssi'))
             self.addr = ord(self.response.get('source_addr')[1])
             self.data = self.response.get('rf_data')
-            # print self.data + ", RSSI = %d dBm @ address %d" % ( self.rssi, self.addr )
+            print self.data + ", RSSI = %d dBm @ address %d" % ( self.rssi, self.addr )
     
     # transmitter
     def transmit_rssi(self):
         # print "Sending packet #",self.pktNum
         # if (self.transmit == True):
             # message = ''.join(['Hello #', repr(self.pktNum)] )
-        self.xbee.tx(dest_addr='\xFF\xFF', data = repr(self.pktNum))
+        if (self.sendingCommand == False):
+            self.sendMessage = repr(self.pktNum)
+        self.xbee.tx(dest_addr='\xFF\xFF', data = self.sendMessage)
         self.pktNum = self.pktNum + 1
         time.sleep(.1)
 
@@ -58,6 +64,8 @@ class XbRssi:
         data_list.append(self.data)
         i = 1
         while i<30:
+           # print i
+           # print self.data
             if self.data != data_list[-1]:
                 rssi_list.append(self.rssi)
                 data_list.append(self.data)
@@ -95,6 +103,7 @@ class XbRssi:
     def start(self):
         self.updateTransmitThread.start()
         self.updateReceiveThread.start()
+
     def close(self):
         self.ser.close()
     def __del__ (self):

@@ -2,6 +2,7 @@ import zc_id
 from Xbee import *
 from LCMBot import *
 from GAscent import *
+from Xbee_chaining_bot import *
 
 if __name__ == '__main__':
         #file_name = raw_input("Please input the file name: ") 
@@ -9,14 +10,23 @@ if __name__ == '__main__':
 
         rid = zc_id.get_id()
         r = LCMBot('{0}/base_cmd'.format(rid))
-        xb = XbRssi('/dev/ttyUSB0')
+        xb = Xbee_chaining_bot('/dev/ttyUSB0')
         xb.start()
 
         ascending_bot = GAscent(r, xb)
-       #s xb.set_transmit_thread(False)
-
         while True:
-            ascend = xb.get_ascend_status()
+            print xb.data
+            if xb.ascend == True:
+                ascending_bot = GAscent(r, xb)
+                ascending_bot.start()
+                xb.end_gradient_ascend()
+            time.sleep(1)
+
+       #s xb.set_transmit_thread(False)
+#	while True:
+#		if xb.get_ascend_status() == True:	
+#        		ascending_bot.start()
+"""            ascend = xb.get_ascend_status()
 
             if ascend == True:
                 ascending_bot.start()
@@ -24,7 +34,7 @@ if __name__ == '__main__':
      #           xb.set_receiver_thread(False)
             bestRSSI,rssi_list = xb.get_max_rssi()
             print xb.sendMessage
-            time.sleep(3)
+            time.sleep(3)   """
         	#else:
         #		sentry_bot.start()
        
