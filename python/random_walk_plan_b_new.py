@@ -29,7 +29,7 @@ def calibration(lastRSSI,xb_bot,zumy_bot,counter,f):
     data = "navigation stage" + str(counter) + "\n"
     f.write(data)
     for i in range(4):
-        zumy_bot.drive_in_dist(True,0.7,1, drive_time+counter*1)
+        zumy_bot.drive_in_dist(True, 0.7,1,drive_time+counter*1)
         rssi = xb_bot.collect_max_rssi()
         print "measured rssi: ", rssi
         data = "measured rssi: " + str(rssi) + "\n"
@@ -77,13 +77,13 @@ def calibration4(xb_bot,zumy_bot):
 
 
 if __name__ == '__main__':
-    file_name = raw_input("Please input the file name: ") 
-    f = open(file_name+".csv","w")
-    try:
+        file_name = raw_input("Please input the file name: ") 
+        f = open(file_name+".csv","w")
+    #try:
         rid = zc_id.get_id()
         r = LCMBot('{0}/base_cmd'.format(rid))
         xb = XbRssi('/dev/ttyUSB0')
-        xb.start()
+        #xb.start()
 
 
         counter = 0
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         while bestRSSI == 9999:
             bestRSSI = xb.collect_max_rssi()
         #bestRSSI = calibration4(xb,r)
-        #print bestRSSI
+        print "current bestRSSI: ", bestRSSI
         while bestRSSI > 38:
             bestRSSI, counter = calibration(bestRSSI, xb, r, counter,f) 
             print "current bestRSSI: ",bestRSSI
@@ -99,8 +99,8 @@ if __name__ == '__main__':
         print "Victory!!!"
         f.write("Victory!!!")
         r.stop()
-    except:
-        r.stop()
-    finally:
-        r.stop()
-        f.close()
+ #except:
+  #      r.stop()
+   # finally:
+    #    r.stop()
+     #   f.close()'''

@@ -14,20 +14,20 @@ class LCMBot:
 		self.lcm.publish(self.base_cmd_channel, self.msg.encode())
 	def turn90(self):
 		try:
-			self.drive(-.13, .13)
-			time.sleep(1)
+			self.drive(-.18, .18)
+			time.sleep(0.65)
 			self.stop()
 		except:
 			self.stop()
 		finally:
 			self.stop()
-	def drive_in_dist(self, dir, forwardRatio,reverseRatio):
+	def drive_in_dist(self, dir, forwardRatio,reverseRatio,t):
 		try:
 			if (dir == True):
 				self.drive(.2*forwardRatio, .2*forwardRatio)
 			elif (dir == False):
 				self.drive(-.2*reverseRatio, -.2*reverseRatio)
-			time.sleep(3)
+			time.sleep(t)
 			self.stop()
 		except:
 			self.stop()
