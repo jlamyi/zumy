@@ -7,76 +7,85 @@ class GDscent:
 
         self.counter_threshold = 1
         self.counter = 0
+        self.stop_rssi = -60
 
-    def drive_time_function(lastRSSI):
+        self.lastRSSI = 9999
+        self.newRSSI = 0
+        self.startRSSI = 0
+        self.endRSSI = 0
+
+    def drive_time_function(self,lastRSSI):
         return (abs(lastRSSI)-40)*0.05 + 0.2
 
-    def stage_benefit(counter):
-        return counter*0.3
+    def stage_benefit(self):
+        return self.counter*0.3
 
-    '''def measure_rssi():
-        rssi, rssi_list = xb_bot.get_max_rssi()
-        if rssi < -70:
-            return (rssi,counter)
-        print "measured rssi: ", rssi
-        return rssi'''
+    def measure_rssi(self,msg):
+        self.newRSSI, rssi_list = self.xb.get_max_rssi()
+        print str(msg) + ": ", self.newRSSI
 
-    def calibration(self,lastRSSI,counter):
+    def check_end(self):
+        if self.newRSSI < self.stop_rssi:
+            self.lastRSSI = self.newRSSI
+            return True
+        return False 
+
+    def calibration(self):
         zumy_bot = self.r
         xb_bot = self.xb
 
-        #difference = -1
-        drive_time = self.drive_time_function(lastRSSI)
+        drive_time = self.drive_time_function(self.lastRSSI)
 
-        print "navigation stage ", counter
+        print "++++++++++++++++++++++++++++++++++"
+        print "navigation stage ", self.counter
 
         for i in range(4):
-            zumy_bot.drive_in_dist(True, 0.22,0.2,drive_time + self.stage_benefit(counter))
 
-            rssi, rssi_list = xb_bot.get_max_rssi()
-            if rssi < -70:
-                return (rssi,counter)
-            print "Stop point rssi: ", rssi
+            print "-----------------------------"
+            self.measure_rssi("Starting point rssi")
+            if self.check_end():
+                return
+            self.startRSSI = self.newRSSI
 
-            difference = abs(rssi) - abs(lastRSSI) 
+
+            zumy_bot.drive_in_dist(True, 0.22,0.2,drive_time + self.stage_benefit())
+
+            self.measure_rssi("Stop point rssi")
+            if self.check_end():
+                return
+            self.endRSSI = self.newRSSI
+
+            difference = abs(self.endRSSI) - abs(self.startRSSI) 
             if difference > 0:
                 print "GETTING TO THE NEXT STOP!"
-                return (rssi,0)
+                self.counter = 0
+                self.lastRSSI = self.endRSSI
+                return 
 
             time.sleep(0.1)
-            zumy_bot.drive_in_dist(False,0.22,0.2, drive_time + self.stage_benefit(counter))
-
-            lastRSSI, rssi_list = xb_bot.get_max_rssi()
-            if lastRSSI < -70:
-                return (lastRSSI,counter)
-            print "Starting point rssi: ", lastRSSI
-
+            zumy_bot.drive_in_dist(False,0.22,0.2, drive_time + self.stage_benefit())
             zumy_bot.turn90()
 
-        counter = counter + 1
-        bestRSSI = lastRSSI
-        
-        # stage management
-        if counter > self.counter_threshold:
-            counter = 0
+        # stage management   
+        self.counter = self.counter + 1
+        if self.counter > self.counter_threshold:
+            self.counter = 0
 
-        return (bestRSSI,counter)
+        return 
 
     def start(self):
     
         print "Start.... Welcome to the new age!"
         xb = self.xb
 
-        counter = 0
-        bestRSSI = 9999
         #time.sleep(20)
 
-        while bestRSSI == 9999:
-            bestRSSI, rssi_list = xb.get_max_rssi()
+        while self.lastRSSI == 9999:
+            self.lastRSSI, rssi_list = xb.get_max_rssi()
+            print "waiting for signal"
 
-        print "Begin navigation and the initial starting point rssi is:  ", bestRSSI
-        while bestRSSI > -70:
-            bestRSSI, counter = self.calibration(bestRSSI, counter) 
+        while self.lastRSSI > self.stop_rssi:
+            self.calibration()
 
         print "Victory!!!"
         self.r.stop()

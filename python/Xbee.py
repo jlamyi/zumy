@@ -43,7 +43,7 @@ class XbRssi:
             self.rssi = -ord(self.response.get('rssi'))
             self.addr = ord(self.response.get('source_addr')[1])
             self.data = self.response.get('rf_data')
-            print self.data + ", RSSI = %d dBm @ address %d" % ( self.rssi, self.addr )
+            #print self.data + ", RSSI = %d dBm @ address %d" % ( self.rssi, self.addr )
     
     # transmitter
     def transmit_rssi(self):
@@ -103,7 +103,7 @@ class XbRssi:
 
     # start threading
     def start(self):
-        self.updateTransmitThread.start()
+        #self.updateTransmitThread.start()
         self.updateReceiveThread.start()
 
     def close(self):
