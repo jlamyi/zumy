@@ -21,12 +21,12 @@ class LCMBot:
 			self.stop()
 		finally:
 			self.stop()
-	def drive_in_dist(self, dir, forwardRatio,reverseRatio,t):
+	def drive_in_dist(self, dir, left, right, t):
 		try:
 			if (dir == True):
-				self.drive(.2*forwardRatio, .2*forwardRatio)
+				self.drive(left, right)
 			elif (dir == False):
-				self.drive(-.2*reverseRatio, -.2*reverseRatio)
+				self.drive(-left, -right)
 			time.sleep(t)
 			self.stop()
 		except:

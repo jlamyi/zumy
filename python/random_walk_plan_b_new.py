@@ -22,15 +22,17 @@ import time
 
 def calibration(lastRSSI,xb_bot,zumy_bot,counter,f):
     difference = -1
-    #drive_time = 3
-    #if lastRSSI < 70:
-    drive_time = (abs(lastRSSI)-40)*0.1 + 2.5 
+
+    #drive_time = (abs(lastRSSI)-40)*0.1 + 1
+    drive_time = (abs(lastRSSI)-40)*0.05 + 0.2
     print "navigation stage ", counter
     data = "navigation stage" + str(counter) + "\n"
     f.write(data)
     for i in range(4):
-        zumy_bot.drive_in_dist(True, 0.7,1,drive_time+counter*1)
-        rssi = xb_bot.get_max_rssi()
+        zumy_bot.drive_in_dist(True, 0.22,0.2,drive_time+counter*0.3)
+        rssi, rssi_list = xb_bot.get_max_rssi()
+        if rssi > -38:
+            return (rssi,counter)
         print "measured rssi: ", rssi
         data = "measured rssi: " + str(rssi) + "\n"
         f.write(data)
@@ -40,7 +42,11 @@ def calibration(lastRSSI,xb_bot,zumy_bot,counter,f):
             f.write("GETTING TO THE NEXT STOP! \n")
             return (rssi,0)
         time.sleep(0.1)
-        zumy_bot.drive_in_dist(False,1,0.7, drive_time+counter*1)
+        zumy_bot.drive_in_dist(False,0.22,0.2, drive_time+counter*0.3)
+        lastRSSI, rssi_list = xb_bot.get_max_rssi()
+        if lastRSSI > -38:
+            return (lastRSSI,counter)
+        print "bestRSSI update: ", lastRSSI
         zumy_bot.turn90()
 
     counter = counter + 1
@@ -48,32 +54,14 @@ def calibration(lastRSSI,xb_bot,zumy_bot,counter,f):
     if counter > 1:
         print "re-calibrating..."
         f.write("re-calibrating...\n")
-        bestRSSI = xb_bot.get_max_rssi()
+        bestRSSI,rssi_list = xb_bot.get_max_rssi()
+        if bestRSSI > -38:
+            return (bestRSSI,counter)
         print "re-calibrated bestRSSI: ", bestRSSI
         f.write("re-calibrated bestRSSI: " + str(bestRSSI) + "\n")
         counter = 0
     return (bestRSSI,counter)
 
-def calibration4(xb_bot,zumy_bot):
-    bestRSSI = 9999;
-    direction = 0;
-    for i in range(4):
-        zumy_bot.drive_in_dist(True,0.7,1)
-        rssi = xb_bot.get_max_rssi()
-        print "initial measured rssi: %d", rssi
-	if rssi < bestRSSI:
-            bestRSSI = rssi
-            direction = i
-        zumy_bot.drive_in_dist(False,1,0.7)
-        time.sleep(0.1)
-        zumy_bot.turn90()
-
-    for j in range(direction):
-        zumy_bot.turn90()
-    
-    zumy_bot.drive_in_dist(True,0.7,1)
-
-    return bestRSSI
 
 
 if __name__ == '__main__':
@@ -87,9 +75,9 @@ if __name__ == '__main__':
 
 
         counter = 0
-        bestRSSI = xb.get_max_rssi()
+        bestRSSI, rssi_list = xb.get_max_rssi()
         while bestRSSI == 9999:
-            bestRSSI = xb.get_max_rssi()
+            bestRSSI, rssi_list = xb.get_max_rssi()
         #bestRSSI = calibration4(xb,r)
         print "current bestRSSI: ", bestRSSI
         while bestRSSI < -38:

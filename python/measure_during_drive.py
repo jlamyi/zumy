@@ -16,12 +16,12 @@ if __name__=='__main__':
 
     # time
     start_time = time.time()
-    driving_time = 5
+    driving_time = 7
     
     # ===============================
     # take measurements
     # ===============================
-    r.drive(0.18,0.18)
+    r.drive(0.18,0.16)  
     i = 0
     while time.time()-start_time < driving_time: 
         rssi_max, rssi_list = xb.get_max_rssi()
@@ -38,7 +38,7 @@ if __name__=='__main__':
 
     # initialize plot
     plt.title('Test_plot')
-    plt.xlabel('Postion')
+    plt.xlabel('Position')
     plt.ylabel('RSSI (dB)')
 
     # initialize variables
@@ -65,10 +65,13 @@ if __name__=='__main__':
     f.close()
 
     # plot
-    plt.plot(t, rssi_max, color='red', linewidth=2.0, linestyle='-', label='$RSSII_{max}$')
+    plt.plot(t, rssi_max, color='red', linewidth=2.0, linestyle='-', label='$RSSI_{max}$')
+    plt.plot(t, rssi_med, color='black', linewidth=2.0, linestyle='-', label='$RSSI_{med}$')
+    plt.plot(t, rssi_avg, color='blue', linewidth=2.0, linestyle='-', label='$RSSI_{avg}$')
+    plt.legend(loc='upper right')
     plt.savefig(file_name + '.png')
     del t, rssi_max, rssi_med, rssi_avg
-    plt.show()
+    # plt.show()
 
 
 

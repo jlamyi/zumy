@@ -38,22 +38,6 @@ class XbRssi:
             return -ord(self.response.get('rssi'))
         else:
             return 9999
-    def get_max_rssi(self):
-        # print "inside get_max_rssi()"
-        self.receive_pkt()
-        current_max_rssi = self.get_rssi()
-        current_max_pkt  = self.get_data()
-        for i in range(30):
-            # print "inside for loop"
-            self.receive_pkt()
-            next_rssi = self.get_rssi()
-            next_pkt  = self.get_data()
-            if next_rssi > current_max_rssi:
-                # print "inside if statemene"
-                current_max_rssi = next_rssi
-                current_max_pkt  = next_pkt
-            print "rssi=" + str(current_max_rssi) + ", pkt=" + next_pkt
-        return current_max_rssi
     def get_addr(self):
         if (self.response != 0):
             return ord(self.response.get('source_addr')[1])
@@ -64,15 +48,6 @@ class XbRssi:
             return self.response.get('rf_data')
         else:
             return 0
-    def get_avg_rssi(self):
-        rssi_list = []
-        for i in range(30):
-            self.receive_pkt()
-            rssi_list.append(self.get_rssi())
-        rssi_avg = mean(rssi_list)
-        print rssi_list
-        print "rssi_avg = " + str(rssi_avg)
-        return rssi_avg, rssi_list
     def get_max_rssi(self):
         rssi_list = []
         for i in range(30):
@@ -100,7 +75,15 @@ class XbRssi:
         print rssi_list
         print "rssi_med = " + str(rssi_med)
         return rssi_med, rssi_list
-
+    def get_avg_rssi(self):
+        rssi_list = []
+        for i in range(30):
+            self.receive_pkt()
+            rssi_list.append(self.get_rssi())
+        rssi_avg = mean(rssi_list)
+        print rssi_list
+        print "rssi_avg = " + str(rssi_avg)
+        return rssi_avg, rssi_list
     def start(self):
         self.updateTransmitThread.start()
         self.updateReceiveThread.start()
