@@ -15,8 +15,17 @@ class XbRssi:
 	self.lastRSSI = 0
 
    def _rssi_loop(self):
-	while True:
-            # self.xbee.send('at', frame_id='A', command='DB')
+
+	pktNum = 1
+        
+        while True:
+
+            print "Sending packet #",pktNum
+            message = ''.join(['Hello #', repr(pktNum)] )
+            self.xbee.tx(dest_addr='\x20\x00', data = message)
+            pktNum = pktNum + 1
+            time.sleep(0.5)
+ 
             response = self.xbee.wait_read_frame()
             self.lastRSSI = ord(response.get('rssi'))
             print "RSSI = -%d dBm" % self.lastRSSI
