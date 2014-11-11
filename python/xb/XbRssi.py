@@ -22,7 +22,7 @@ class XbRssi:
 
             print "Sending packet #",pktNum
             message = ''.join(['Hello #', repr(pktNum)] )
-            self.xbee.tx(dest_addr='\x20\x00', data = message)
+            self.xbee.tx(dest_addr='\xFF\xFF', data = message)
             pktNum = pktNum + 1
             time.sleep(0.5)
  
