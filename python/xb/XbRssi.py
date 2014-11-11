@@ -16,6 +16,7 @@ class XbRssi:
 	self.updateThread = threading.Thread(target=self._rssi_loop)
 	self.updateThread.daemon = True
 	self.lastRSSI = 0
+        self.lastAddr = 0
 
    def _rssi_loop(self):
 
@@ -31,11 +32,16 @@ class XbRssi:
  
             response = self.xbee.wait_read_frame()
             self.lastRSSI = ord(response.get('rssi'))
-            print "RSSI = -%d dBm" % self.lastRSSI
+            self.lastAddr = ord(response.get('source_addr')[1])
+
+            print "RSSI = -%d dBm @ address %d" % (self.lastRSSI,self.lastAddr)
 	    time.sleep(1)
 	
    def getRssi(self):
 	return self.lastRSSI
+
+   def getAddr(self):
+	return self.lastAddr
  
    def start(self):
 	self.updateThread.start()

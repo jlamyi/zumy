@@ -56,7 +56,8 @@ class ZumyLCMNode:
 	    xbee_msg.header.seq +=1
 	    xbee_msg.header.time = time.time()
             xbee_msg.rssi = xb_rssi.getRssi()
-            print 'rssi' + str(xbee_msg.rssi)
+            xbee_msg.addr = xb_rssi.getAddr()
+            # print 'rssi = ' + str(xbee_msg.rssi) + '@ address ' + str(xbee_msg.addr)
             try:
                 self.lcm.publish(self.carrier_state_channel, msg.encode())
 		self.lcm.publish(self.xbee_channel, xbee_msg.encode())

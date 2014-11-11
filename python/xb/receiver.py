@@ -19,7 +19,8 @@ def main():
             response = xbee.wait_read_frame()
             print response
             lastRSSI = response.get('rssi')
-            print "RSSI = -%d dBm" % ord(lastRSSI)
+            lastAddr = response.get('source_addr')
+            print "RSSI = -%d dBm @ %d" % (ord(lastRSSI),ord(lastAddr[1]))
             
         
     except KeyboardInterrupt:

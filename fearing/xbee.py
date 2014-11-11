@@ -12,11 +12,12 @@ import struct
 import fearing.header
 
 class xbee(object):
-    __slots__ = ["header", "rssi"]
+    __slots__ = ["header", "rssi", "addr"]
 
     def __init__(self):
         self.header = fearing.header()
         self.rssi = 0
+        self.addr = 0
 
     def encode(self):
         buf = BytesIO()
@@ -27,7 +28,7 @@ class xbee(object):
     def _encode_one(self, buf):
         assert self.header._get_packed_fingerprint() == fearing.header._get_packed_fingerprint()
         self.header._encode_one(buf)
-        buf.write(struct.pack(">q", self.rssi))
+        buf.write(struct.pack(">qq", self.rssi, self.addr))
 
     def decode(data):
         if hasattr(data, 'read'):
@@ -42,7 +43,7 @@ class xbee(object):
     def _decode_one(buf):
         self = xbee()
         self.header = fearing.header._decode_one(buf)
-        self.rssi = struct.unpack(">q", buf.read(8))[0]
+        self.rssi, self.addr = struct.unpack(">qq", buf.read(16))
         return self
     _decode_one = staticmethod(_decode_one)
 
@@ -50,7 +51,7 @@ class xbee(object):
     def _get_hash_recursive(parents):
         if xbee in parents: return 0
         newparents = parents + [xbee]
-        tmphash = (0xd54dae434f337fd3+ fearing.header._get_hash_recursive(newparents)) & 0xffffffffffffffff
+        tmphash = (0x67ebd03fb3e553dc+ fearing.header._get_hash_recursive(newparents)) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff)  + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _get_hash_recursive = staticmethod(_get_hash_recursive)

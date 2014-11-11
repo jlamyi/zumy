@@ -3,5 +3,5 @@ package fearing;
 struct xbee {
     header header;
     int64_t rssi;
-   
+    int64_t addr;
 }

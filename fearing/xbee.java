@@ -13,13 +13,14 @@ public final class xbee implements lcm.lcm.LCMEncodable
 {
     public fearing.header header;
     public long rssi;
+    public long addr;
  
     public xbee()
     {
     }
  
     public static final long LCM_FINGERPRINT;
-    public static final long LCM_FINGERPRINT_BASE = 0xd54dae434f337fd3L;
+    public static final long LCM_FINGERPRINT_BASE = 0x67ebd03fb3e553dcL;
  
     static {
         LCM_FINGERPRINT = _hashRecursive(new ArrayList<Class<?>>());
@@ -50,6 +51,8 @@ public final class xbee implements lcm.lcm.LCMEncodable
  
         outs.writeLong(this.rssi); 
  
+        outs.writeLong(this.addr); 
+ 
     }
  
     public xbee(byte[] data) throws IOException
@@ -78,6 +81,8 @@ public final class xbee implements lcm.lcm.LCMEncodable
  
         this.rssi = ins.readLong();
  
+        this.addr = ins.readLong();
+ 
     }
  
     public fearing.xbee copy()
@@ -86,6 +91,8 @@ public final class xbee implements lcm.lcm.LCMEncodable
         outobj.header = this.header.copy();
  
         outobj.rssi = this.rssi;
+ 
+        outobj.addr = this.addr;
  
         return outobj;
     }
