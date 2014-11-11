@@ -1,12 +1,15 @@
 from xbee import XBee
 import sys
 import serial, time, threading
+import zc_id
 
 class XbRssi:
    def __init__(self, serial_port): 
    	ser = serial.Serial(serial_port, 57600)
     	self.xbee = XBee(ser)
-    	self.xbee.at(frame='A', command='MY', parameter='\x20\x01')
+        rid = zc_id.get_id()
+        rid = rid.split("/",1)[1] 
+    	self.xbee.at(frame='A', command='MY', parameter='\x20'+chr(int(rid)))
     	self.xbee.at(frame='B', command='CH', parameter='\x0e')
     	self.xbee.at(frame='C', command='ID', parameter='\x99\x99')
 
