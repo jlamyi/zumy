@@ -14,7 +14,7 @@ supported.
 """
 # $Id: xbee-serial-terminal.py 7 2009-12-30 16:25:08Z amitsnyderman $
 
-import sys, time, cmd, serial, binascii,time
+import sys, time, cmd, serial, binascii,time, zc_id
 #import XBeeHelper
 from xbee import XBee
 
@@ -26,9 +26,9 @@ xbee = XBee(ser)
 while True:
     try:
         content='transimit test \n'
-            #ser.write(frame)
-        
-        xbee.at(frame='A', command='MY', parameter='\x20\x00')
+        rid = zc_id.get_id()
+        rid = rid.split("/",1)[1] 
+        xbee.at(frame='A', command='MY', parameter='\x20'+chr(int(rid)))
         xbee.at(frame='B', command='CH', parameter='\x0e')
         xbee.at(frame='C', command='ID', parameter='\x99\x99')
         xbee.at(frame='D', command='CH')
@@ -42,7 +42,7 @@ while True:
         while(1):
             print "Sending packet #",pktNum
             message = ''.join(['Hello #', repr(pktNum)] )
-            xbee.tx(dest_addr='\x20\x01', data = message)
+            xbee.tx(dest_addr='\xFF\xFF', data = message)
             pktNum = pktNum + 1
             time.sleep(0.5)
             

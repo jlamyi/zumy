@@ -1,5 +1,5 @@
 from xbee import XBee
-import serial, time
+import serial, time, zc_id
 
 def main():
     """
@@ -8,24 +8,30 @@ def main():
     """
     ser = serial.Serial('/dev/ttyUSB0', 57600)
     xbee = XBee(ser)
-    xbee.at(frame='A', command='MY', parameter='\x20\x01')
+    rid = zc_id.get_id()
+    rid = rid.split("/",1)[1] 
+    xbee.at(frame='A', command='MY', parameter='\x20'+chr(int(rid)))
     xbee.at(frame='B', command='CH', parameter='\x0e')
     xbee.at(frame='C', command='ID', parameter='\x99\x99')
-    
+    f = open("data.csv","w")    
     try:
-    
+	i = 0
+    #	f = file.open("data.csv")
         while(1):
     #       xbee.send('at', frame_id='A', command='DB')
             response = xbee.wait_read_frame()
-            print response
-            lastRSSI = response.get('rssi')
+   #         print response
+            lastRSSI = ord(response.get('rssi'))
             lastAddr = response.get('source_addr')
-            print "RSSI = -%d dBm @ %d" % (ord(lastRSSI),ord(lastAddr[1]))
-            
+            print "RSSI = -%d dBm @ %d at index %d" % (lastRSSI,ord(lastAddr[1]), i)
+            data = str(i) + ", -" + str(lastRSSI) +"\n"
+	    f.write(data)
+	    i = i+1
         
     except KeyboardInterrupt:
         pass
     finally:
+	f.close()
         ser.close()
     
 if __name__ == '__main__':
