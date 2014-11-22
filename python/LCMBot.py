@@ -1,6 +1,4 @@
-import time
-import lcm
-import fearing
+import time, lcm, fearing
 from fearing import base_cmd
 
 

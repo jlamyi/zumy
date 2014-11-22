@@ -1,17 +1,11 @@
-import time
-# import lcm
-import threading
-# from fearing import base_cmd
-# import fearing
-import serial
+import time, threading, serial, zc_id
 from xbee import XBee
-# import sys
 
 class XbRssi:
     def __init__(self, serial_port): 
         self.ser = serial.Serial(serial_port, 57600)
         self.xbee = XBee(self.ser)
-        self.rid = '/01'
+        self.rid = zc_id.get_id()
         self.rid = self.rid.split("/",1)[1] 
         self.xbee.at(frame='A', command='MY', parameter='\x20'+chr(int(self.rid)))
         self.xbee.at(frame='B', command='CH', parameter='\x0e')
@@ -36,11 +30,17 @@ class XbRssi:
         time.sleep(0.5)
     def receive_rssi(self):
         self.response = self.xbee.wait_read_frame()
-        print "RSSI = -%d dBm @ address %d" % ( self.get_rssi(), self.get_addr() )
+        # print "RSSI = -%d dBm @ address %d" % ( self.get_rssi(), self.get_addr() )
     def get_rssi(self):
-        return ord(self.response.get('rssi'))
+        if (self.response != 0):
+            return ord(self.response.get('rssi'))
+        else:
+            return 0
     def get_addr(self):
-        return ord(self.response.get('source_addr')[1])
+        if (self.response != 0):
+            return ord(self.response.get('source_addr')[1])
+        else:
+            return 0
     def start(self):
         self.updateTransmitThread.start()
         self.updateReceiveThread.start()
@@ -52,4 +52,6 @@ class XbRssi:
 if __name__=='__main__':
     xb = XbRssi('/dev/ttyUSB0')
     xb.start()
-    time.sleep(10)
+    for x in range(0, 3):
+        print "RSSI = -%d dBm @ address %d" % ( xb.get_rssi(), xb.get_addr() )
+        time.sleep(0.5)
