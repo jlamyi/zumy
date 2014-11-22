@@ -15,24 +15,20 @@ def main():
     xbee.at(frame='C', command='ID', parameter='\x99\x99')
     f = open("data.csv","w")    
     try:
-	i = 0
-    #	f = file.open("data.csv")
+        i = 0
         while(1):
-    #       xbee.send('at', frame_id='A', command='DB')
             response = xbee.wait_read_frame()
-   #         print response
             lastRSSI = ord(response.get('rssi'))
             lastAddr = response.get('source_addr')
             print "RSSI = -%d dBm @ %d at index %d" % (lastRSSI,ord(lastAddr[1]), i)
             data = str(i) + ", -" + str(lastRSSI) +"\n"
-	    f.write(data)
-	    i = i+1
-        
+            f.write(data)
+            i = i+1
     except KeyboardInterrupt:
         pass
     finally:
-	f.close()
+        f.close()
         ser.close()
-    
+
 if __name__ == '__main__':
     main()
