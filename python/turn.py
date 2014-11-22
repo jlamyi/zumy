@@ -6,21 +6,12 @@ from LCMBot import *
 if __name__=='__main__':
     rid = zc_id.get_id()
     r0 = LCMBot('{0}/base_cmd'.format(rid))
-    xb = XbRssi('/dev/ttyUSB0')
-    xb.start()
+    print r0
     try:
-    	while True:
-        	lastRSSI = xb.get_rssi()
-        	while(lastRSSI<45):
-            		r0.drive(.1,.1)
-            		print "RSSI = -%d dBm @ address %d" % ( xb.get_rssi(), xb.get_addr() )
-            		print "running"
-            		lastRSSI = xb.get_rssi()
-            		time.sleep(0.5)
-        	r0.drive(0,0)
-        	print "RSSI = -%d dBm @ address %d" % ( xb.get_rssi(), xb.get_addr() )
-        	print "stopped"
-        	time.sleep(0.5)
+    	#Zumy 1
+	r0.drive(-.15, .15)
+	time.sleep(1)
+	r0.drive(0, 0)
     except:
 	r0.drive(0, 0)
     finally:

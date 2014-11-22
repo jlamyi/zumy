@@ -23,11 +23,11 @@ class XbRssi:
         while True:
             self.receive_rssi()
     def transmit_rssi(self):
-        print "Sending packet #",self.pktNum
+        # print "Sending packet #",self.pktNum
         message = ''.join(['Hello #', repr(self.pktNum)] )
         self.xbee.tx(dest_addr='\xFF\xFF', data = message)
         self.pktNum = self.pktNum + 1
-        time.sleep(0.5)
+        time.sleep(0.01)
     def receive_rssi(self):
         self.response = self.xbee.wait_read_frame()
         # print "RSSI = -%d dBm @ address %d" % ( self.get_rssi(), self.get_addr() )
@@ -36,6 +36,14 @@ class XbRssi:
             return ord(self.response.get('rssi'))
         else:
             return 0
+    def collect_max_rssi(self):
+        current_max_rssi = self.get_rssi();
+        for i in range(30):
+            cur = self.get_rssi()
+            print "rssi=" + str(cur)
+            if cur > current_max_rssi:
+                current_max_rssi = cur
+        return current_max_rssi
     def get_addr(self):
         if (self.response != 0):
             return ord(self.response.get('source_addr')[1])
@@ -52,6 +60,6 @@ class XbRssi:
 if __name__=='__main__':
     xb = XbRssi('/dev/ttyUSB0')
     xb.start()
-    for x in range(0, 3):
-        print "RSSI = -%d dBm @ address %d" % ( xb.get_rssi(), xb.get_addr() )
+    while True:
+        print "RSSI = -%d dBm @ address %d" % ( xb.collect_max_rssi(), xb.get_addr() )
         time.sleep(0.5)

@@ -8,11 +8,17 @@ if __name__=='__main__':
     xb = XbRssi('/dev/ttyUSB0')
     xb.start()
     f = open("data.csv","w")
-    i = 0
-    while True:
-        lastRSSI = xb.get_rssi()
-        data = str(i) + ", -" + str(lastRSSI) +"\n"
-        print "RSSI = -%d dBm @ address %d" % ( xb.get_rssi(), xb.get_addr() )
-        f.write(data)
-        i = i + 1
-        time.sleep(0.5)
+    try:
+        i = 0
+        while True:
+            last_RSSI = xb.get_rssi()
+            last_addr = xb.get_addr()
+            data = str(last_addr) + ", " + str(i) + ", -" + str(last_RSSI) + "\n"
+            print "RSSI = -%d dBm @ address %d" % ( last_RSSI, last_addr )
+            f.write(data)
+            i = i + 1
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        f.close()

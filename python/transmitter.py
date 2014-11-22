@@ -44,7 +44,7 @@ while True:
             message = ''.join(['Hello #', repr(pktNum)] )
             xbee.tx(dest_addr='\xFF\xFF', data = message)
             pktNum = pktNum + 1
-            time.sleep(0.5)
+            time.sleep(0.01)
             
     except KeyboardInterrupt:
         break
