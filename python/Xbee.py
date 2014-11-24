@@ -35,7 +35,7 @@ class XbRssi:
         if (self.response != 0):
             return ord(self.response.get('rssi'))
         else:
-            return 0
+            return 9999
     def collect_max_rssi(self):
         current_max_rssi = self.get_rssi();
         for i in range(30):

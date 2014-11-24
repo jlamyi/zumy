@@ -14,25 +14,27 @@ class LCMBot:
 		self.lcm.publish(self.base_cmd_channel, self.msg.encode())
 	def turn90(self):
 		try:
-			self.drive(-.2, .2)
-			time.sleep(1.1)
-			self.drive(0, 0)
+			self.drive(-.13, .13)
+			time.sleep(1)
+			self.stop()
 		except:
-			self.drive(0, 0)
+			self.stop()
 		finally:
-			self.drive(0, 0)
-	def drive_in_dist(self, dir):
+			self.stop()
+	def drive_in_dist(self, dir, forwardRatio,reverseRatio):
 		try:
 			if (dir == True):
-				self.drive(.2, .2)
-			elif (dir == Flase):
-				self.drive(-.2, -.2)
-			time.sleep(1.2)
-			self.drive(0, 0)
+				self.drive(.2*forwardRatio, .2*forwardRatio)
+			elif (dir == False):
+				self.drive(-.2*reverseRatio, -.2*reverseRatio)
+			time.sleep(3)
+			self.stop()
 		except:
-			self.drive(0, 0)
+			self.stop()
 		finally:
-			self.drive(0, 0)
+			self.stop()
+	def stop(self):
+		self.drive(0, 0)
 
 
 if __name__=='__main__':

@@ -41,10 +41,14 @@ while True:
         
         while(1):
             print "Sending packet #",pktNum
-            message = ''.join(['Hello #', repr(pktNum)] )
+            if pktNum % 20 == 0:
+    #            message = ''.join(['Hello #', repr(pktNum)] )
+               message = ''.join(['TRANSMIT_START'])
+            else:
+                message = ''.join(['TRANSMIT_STOP'])
             xbee.tx(dest_addr='\xFF\xFF', data = message)
             pktNum = pktNum + 1
-            time.sleep(0.01)
+            time.sleep(1)
             
     except KeyboardInterrupt:
         break

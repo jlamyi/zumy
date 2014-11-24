@@ -9,8 +9,8 @@ if __name__=='__main__':
     print r0
     try:
     	#Zumy 1
-	r0.drive(-.15, .15)
-	time.sleep(1)
+	r0.drive(-.1, .1)
+	time.sleep(10)
 	r0.drive(0, 0)
     except:
 	r0.drive(0, 0)

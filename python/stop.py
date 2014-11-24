@@ -10,7 +10,7 @@
 import time, lcm
 from fearing import base_cmd
 import fearing
-
+import zc_id
 
 # In[18]:
 
@@ -29,7 +29,8 @@ class LCMBot:
 # In[19]:
 
 if __name__=='__main__':
-    robot = LCMBot('/066/base_cmd')
+    rid = zc_id.get_id()
+    robot = LCMBot(s'{0}/base_cmd'.format(rid))
     robot.drive(0,0)
     robot.drive(.1,.1)
     robot.drive(0,0)
