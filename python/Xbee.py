@@ -21,32 +21,46 @@ class XbRssi:
             self.transmit_rssi()
     def receive_loop(self):
         while True:
-            self.receive_rssi()
+            self.collect_max_rssi()
+            # self.receive_pkt()
     def transmit_rssi(self):
         # print "Sending packet #",self.pktNum
         message = ''.join(['Hello #', repr(self.pktNum)] )
         self.xbee.tx(dest_addr='\xFF\xFF', data = message)
         self.pktNum = self.pktNum + 1
         time.sleep(0.01)
-    def receive_rssi(self):
+    def receive_pkt(self):
         self.response = self.xbee.wait_read_frame()
-        # print "RSSI = -%d dBm @ address %d" % ( self.get_rssi(), self.get_addr() )
+        # print self.get_data() + ", RSSI = -%d dBm @ address %d" % ( self.get_rssi(), self.get_addr() )
     def get_rssi(self):
         if (self.response != 0):
             return ord(self.response.get('rssi'))
         else:
             return 9999
     def collect_max_rssi(self):
-        current_max_rssi = self.get_rssi();
+        # print "inside collect_max_rssi()"
+        self.receive_pkt()
+        current_max_rssi = self.get_rssi()
+        current_max_pkt  = self.get_data()
         for i in range(30):
-            cur = self.get_rssi()
-            print "rssi=" + str(cur)
-            if cur > current_max_rssi:
-                current_max_rssi = cur
+            # print "inside for loop"
+            self.receive_pkt()
+            next_rssi = self.get_rssi()
+            next_pkt  = self.get_data()
+            if next_rssi > current_max_rssi:
+                # print "inside if statemene"
+                current_max_rssi = next_rssi
+                current_max_pkt  = next_pkt
+            print "rssi=" + str(current_max_rssi) + ", pkt=" + next_pkt
         return current_max_rssi
     def get_addr(self):
         if (self.response != 0):
             return ord(self.response.get('source_addr')[1])
+        else:
+            return 0
+    def get_data(self):
+        if (self.response != 0):
+            return self.response.get('rf_data')
         else:
             return 0
     def start(self):
@@ -61,5 +75,5 @@ if __name__=='__main__':
     xb = XbRssi('/dev/ttyUSB0')
     xb.start()
     while True:
-        print "RSSI = -%d dBm @ address %d" % ( xb.collect_max_rssi(), xb.get_addr() )
+        # print "RSSI = -%d dBm @ address %d" % ( xb.collect_max_rssi(), xb.get_addr() )
         time.sleep(0.5)
