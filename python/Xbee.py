@@ -51,7 +51,7 @@ class XbRssi:
                 # print "inside if statemene"
                 current_max_rssi = next_rssi
                 current_max_pkt  = next_pkt
-            print "rssi=" + str(current_max_rssi) + ", pkt=" + next_pkt
+            #print "rssi=" + str(current_max_rssi) + ", pkt=" + next_pkt
         return current_max_rssi
     def get_addr(self):
         if (self.response != 0):
