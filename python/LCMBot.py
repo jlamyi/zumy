@@ -15,7 +15,7 @@ class LCMBot:
 	def turn90(self):
 		try:
 			self.drive(-.18, .18)
-			time.sleep(0.65)
+			time.sleep(0.55)
 			self.stop()
 		except:
 			self.stop()

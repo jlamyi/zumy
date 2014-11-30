@@ -24,18 +24,18 @@ def calibration(lastRSSI,xb_bot,zumy_bot,counter,f):
     difference = -1
     #drive_time = 3
     #if lastRSSI < 70:
-    drive_time = (lastRSSI-40)*0.1 + 2.5 
+    drive_time = (abs(lastRSSI)-40)*0.1 + 2.5 
     print "navigation stage ", counter
     data = "navigation stage" + str(counter) + "\n"
     f.write(data)
     for i in range(4):
         zumy_bot.drive_in_dist(True, 0.7,1,drive_time+counter*1)
-        rssi = xb_bot.collect_max_rssi()
+        rssi = xb_bot.get_max_rssi()
         print "measured rssi: ", rssi
         data = "measured rssi: " + str(rssi) + "\n"
         f.write(data)
         difference = lastRSSI - rssi
-        if difference > 0:
+        if difference < 0:
             print "GETTING TO THE NEXT STOP!"
             f.write("GETTING TO THE NEXT STOP! \n")
             return (rssi,0)
@@ -48,7 +48,7 @@ def calibration(lastRSSI,xb_bot,zumy_bot,counter,f):
     if counter > 1:
         print "re-calibrating..."
         f.write("re-calibrating...\n")
-        bestRSSI = xb_bot.collect_max_rssi()
+        bestRSSI = xb_bot.get_max_rssi()
         print "re-calibrated bestRSSI: ", bestRSSI
         f.write("re-calibrated bestRSSI: " + str(bestRSSI) + "\n")
         counter = 0
@@ -59,7 +59,7 @@ def calibration4(xb_bot,zumy_bot):
     direction = 0;
     for i in range(4):
         zumy_bot.drive_in_dist(True,0.7,1)
-        rssi = xb_bot.collect_max_rssi()
+        rssi = xb_bot.get_max_rssi()
         print "initial measured rssi: %d", rssi
 	if rssi < bestRSSI:
             bestRSSI = rssi
@@ -87,12 +87,12 @@ if __name__ == '__main__':
 
 
         counter = 0
-        bestRSSI = xb.collect_max_rssi()
+        bestRSSI = xb.get_max_rssi()
         while bestRSSI == 9999:
-            bestRSSI = xb.collect_max_rssi()
+            bestRSSI = xb.get_max_rssi()
         #bestRSSI = calibration4(xb,r)
         print "current bestRSSI: ", bestRSSI
-        while bestRSSI > 38:
+        while bestRSSI < -38:
             bestRSSI, counter = calibration(bestRSSI, xb, r, counter,f) 
             print "current bestRSSI: ",bestRSSI
             f.write("current bestRSSI: " + str(bestRSSI) + "\n")
