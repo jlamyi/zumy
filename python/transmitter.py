@@ -48,7 +48,7 @@ while True:
                 message = ''.join(['TRANSMIT_STOP'])
             xbee.tx(dest_addr='\xFF\xFF', data = message)
             pktNum = pktNum + 1
-            time.sleep(1)
+            time.sleep(0.01)
             
     except KeyboardInterrupt:
         break
