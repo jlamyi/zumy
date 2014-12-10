@@ -18,6 +18,7 @@ def main():
         i = 0
         while(1):
             response = xbee.wait_read_frame()
+            print response
             lastRSSI = ord(response.get('rssi'))
             lastAddr = response.get('source_addr')
             print "RSSI = -%d dBm @ %d at index %d" % (lastRSSI,ord(lastAddr[1]), i)
