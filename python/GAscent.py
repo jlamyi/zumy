@@ -73,14 +73,20 @@ class GAscent:
 
         print "Victory!!!"
         self.r.stop()
-        ack = xb.get_data()
-        self.xb.send_arrival_signal()
+
+        #ack = xb.get_data()
+        #self.xb.send_arrival_signal()
+
         #while ~ack.startswith("ACK"):
         #    xb.set_transmit_thread(True)
             
         #    xb.send_arrival_signal()
         print "Exit GAscend"
-        #print self.xb.sendMessage
+        # xb.set_ascend(False)
+
+        #print self.xb.sendMessage 
         #f.write("Victory!!!")
+
+######## TODO: write another script to test Xbee_driver.py with Class GAscent. Chaining_bot.py can be a reference for this script
         
 
