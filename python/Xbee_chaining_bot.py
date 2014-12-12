@@ -1,11 +1,13 @@
-    
+
+import time, threading, serial, zc_id
+from xbee import XBee
+from numpy import *
+
 import Xbee_driver
 
-class Chaining_bot:
+class Xbee_chiaing_bot(Xbee_driver):
     def __init__(self, serial_port): 
-
-        self.xbee = XbRssi(serial_port)
-
+        Xbee_driver.__init__(self,serial_port)        
         self.predecessor = 0
         self.successor = 0
         self.transmit = True
@@ -14,12 +16,23 @@ class Chaining_bot:
         self.startReceive = True
         self.sendMessage = self.id+'PKT'
 
-        self.buffer = ['0']
-        #self.newest_byte = '0'
+    def receive_loop(self):
+        while True:
+            #if self.startReceive == True:
+            # self.get_max_rssi()
+            #self.receive_pkt()
+
+            self.response = self.xbee.wait_read_frame()
+            self.rssi = -ord(self.response.get('rssi'))
+            self.addr = ord(self.response.get('source_addr')[1])
+            self.data = self.response.get('rf_data')
+
+            self.decode_msg() 
+            #time.sleep(10)
 
     def decode_msg(self):
         if (self.response != 0):
-            msg =  self.get_data()
+            msg =  self.data
             #print msg
             if msg.startswith('TRANSMIT_START'):
                 if (self.predecessor == self.get_sender_id(msg)):
@@ -65,13 +78,13 @@ class Chaining_bot:
 
     def send_ack(self):
         send_msg = 'ACK'+str(self.rid)
-        msg = self.get_data()
+        msg = self.data
         strr='0'
         while(~msg.startswith('STOP_ACK')):
             print "Sending ACK"
             self.xbee.tx(dest_addr='\xFF\xFF', data = send_msg)
             self.pktNum = self.pktNum + 1
-            msg = self.get_data()
+            msg = self.data
             i = 0
             while True:
                 i = i+1
@@ -103,7 +116,7 @@ class Chaining_bot:
             print "Sending Ending_command"
             self.xbee.tx(dest_addr='\xFF\xFF', data = send_msg)
             self.pktNum = self.pktNum + 1
-            msg = self.get_data()
+            msg = self.data
             i = 0
             while True:
                 i = i+1
@@ -146,7 +159,7 @@ class Chaining_bot:
         print "Exiting Ending_command"
 
     def send_msg(self, sendmsg):
-        msg = self.get_data()
+        msg = self.data
         print sendmsg
         while msg == 0:
             self.xbee.tx(dest_addr='\xFF\xFF', data = sendmsg)
@@ -156,7 +169,7 @@ class Chaining_bot:
                 signal.alarm(1)
             except:
                 print self.pktNum
-            msg = self.get_data()
+            msg = self.data
             print msg
             time.sleep(1)
 
@@ -164,10 +177,14 @@ class Chaining_bot:
             self.xbee.tx(dest_addr='\xFF\xFF', data = sendmsg)
             self.pktNum = self.pktNum + 1
             self.receive_pkt()
-            msg = self.get_data()
+            msg = self.data
             time.sleep(2)
             print 'waiting_for_ack for' + sendmsg
         self.sendMessage = 'STOP_ACK'
+
+    def read_byte(self):
+        self.newest_byte = self.ser.read()
+        return self.newest_byte
 
     def send_arrival_signal(self):
         self.sendMessage = 'ARRIVAL-'+str(self.rid)
@@ -223,18 +240,9 @@ class Chaining_bot:
 
     def set_ascend(self, b):
         self.ascend = b
-'''
-    def start(self):
-        #self.updateTransmitThread.start()
-        self.updateReceiveThread.start()
-    
-    def close(self):
-        self.ser.close()
 
-    def __del__ (self):
-        self.ser.close()'''
 
-'''if __name__=='__main__':
+if __name__=='__main__':
     xb = XbRssi('/dev/ttyUSB0')
     #xb.start()
     result = xb.get_max_rssi()
@@ -244,6 +252,9 @@ class Chaining_bot:
     result = xb.get_avg_rssi()
     print "the average is: ", result
     result = xb.get_med_rssi()
-    print "the median is: ", result'''
+    print "the median is: ", result
 
 
+    #while True:
+        # print "RSSI = -%d dBm @ address %d" % ( xb.get_max_rssi(), xb.get_addr() )
+      #  time.sleep(0.5)
