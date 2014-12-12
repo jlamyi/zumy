@@ -243,8 +243,8 @@ class Xbee_chiaing_bot(Xbee_driver):
 
 
 if __name__=='__main__':
-    xb = XbRssi('/dev/ttyUSB0')
-    #xb.start()
+    xb = Xbee_chiaing_bot('/dev/ttyUSB0')
+
     result = xb.get_max_rssi()
     print "the maximum is: ", result
     result = xb.get_min_rssi()
@@ -254,7 +254,3 @@ if __name__=='__main__':
     result = xb.get_med_rssi()
     print "the median is: ", result
 
-
-    #while True:
-        # print "RSSI = -%d dBm @ address %d" % ( xb.get_max_rssi(), xb.get_addr() )
-      #  time.sleep(0.5)
