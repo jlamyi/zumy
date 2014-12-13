@@ -12,6 +12,7 @@ class Xbee_chaining_bot(XbRssi):
         self.descend = False
         self.startReceive = True
         self.sendMessage = self.id+'PKT'
+        self.cmdList = []
 
     def receive_loop(self):
         while True:
@@ -49,6 +50,12 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.startswith('ARRIVAL'):
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_ARRIVAL'+str(self.rid)
+                self.cmdList.append('TRANSMIT_START')
+                if (self.successor == 0):
+                    self.successor = self.get_sender_id(msg)
+                    print 'Successor is set to'+str(self.successor)
+                    self.cmdList.append('SET_PREDECESSOR')
+                self.cmdList.append('ASCEND_START')
 
             elif msg.startswith('SET_PREDECESSOR'):
                 self.set_predecessor(msg)
@@ -65,39 +72,35 @@ class Xbee_chaining_bot(XbRssi):
             else:
                 if self.sendMessage.startswith('STOP_ACK'):
                     self.sendingCommand = False
+                if self.sendMessage.isdigit() and msg.isdigit():
+                    print "regular transmission"
+                    if len(self.cmdList):
+                        self.send_signal(self.cmdList.pop())
         else:
             return 0
 
-    def send_arrival_signal(self):
-        self.sendMessage = 'ARRIVAL-'+str(self.rid)
+    def send_signal(self, msg):
+        self.sendMessage = msg + '-'+str(self.rid)
         self.sendingCommand = True
         while(self.sendingCommand == True):
             print self.data
-            print 'waiting_ack_for_arrival'
+            print 'waiting_ack_for_'+msg
+            time.sleep(3)
+
+    def send_arrival_signal(self):
+        self.send_signal('ARRIVAL')
 
     def send_start_transmit_signal(self):
-        self.sendMessage = 'TRANSMIT_START-'+str(self.rid)
-        self.sendingCommand = True
-        while(self.sendingCommand == True):
-            print 'waiting_ack_for_stop_transmit'
+        self.send_signal('TRANSMIT_START')
 
     def send_stop_transmit_signal(self):
-        self.sendMessage = 'TRANSMIT_STOP-'+str(self.rid)
-        self.sendingCommand = True
-        while(self.sendingCommand == True):
-            print 'waiting_ack_for_stop_transmit'
+        self.send_signal('TRANSMIT_STOP')
 
     def send_set_predecessor_signal(self):
-        self.sendMessage = 'SET_PREDECESSOR-'+str(self.rid)
-        self.sendingCommand = True
-        while(self.sendingCommand == True):
-            print 'waiting_ack_for_set_predecessor'
+        self.send_signal('SET_PREDECESSOR') 
 
     def send_start_ascend_signal(self):
-        self.sendMessage = 'ASCEND_START-'+str(self.rid)
-        self.sendingCommand = True
-        while(self.sendingCommand == True):
-            print 'waiting_ack_for_ascend_start'
+        self.send_signal('ASCEND_START')
 
     def end_gradient_ascend(self):
         self.ascend = False
