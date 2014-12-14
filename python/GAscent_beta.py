@@ -1,6 +1,6 @@
 import time
 
-class GDscent:
+class GAscent_beta:
     def __init__(self, zumy, xbee):
         self.r = zumy
         self.xb = xbee
@@ -10,7 +10,7 @@ class GDscent:
 
         self.counter_threshold = 1
         self.counter = 0
-        self.stop_rssi = -60
+        self.stop_rssi = -38
 
         self.lastRSSI = 9999
         self.newRSSI = 0
@@ -30,7 +30,7 @@ class GDscent:
     
     # check if this algorithm should end
     def check_end(self):
-        if self.newRSSI < self.stop_rssi:
+        if self.newRSSI > self.stop_rssi:
             self.lastRSSI = self.newRSSI
             return True
         return False 
@@ -42,6 +42,8 @@ class GDscent:
         drive_time = self.drive_time_function()
 
         last_endRssi = 0
+
+        flag = False
 
         print "++++++++++++++++++++++++++++++++++"
         print "navigation stage ", self.counter
@@ -60,10 +62,15 @@ class GDscent:
             if self.check_end():
                 return
             self.endRSSI = self.newRSSI
-            #last_endRssi = self.newRSSI
+
+            print "endRSSI: ", abs(self.endRSSI)
+            print "last_endRssi: ", abs(last_endRssi)
+            if i > 0 and abs(self.endRSSI) > abs(last_endRssi): 
+                flag = True
+            last_endRssi = self.newRSSI
 
             difference = abs(self.endRSSI) - abs(self.startRSSI) 
-            if difference > 0:
+            if difference < 0:
                 print "GETTING TO THE NEXT STOP!"
                 self.counter = 0
                 self.lastRSSI = self.endRSSI
@@ -71,11 +78,10 @@ class GDscent:
 
             zumy_bot.drive_in_dist(False,self.left_wheel,self.right_wheel, drive_time + self.stage_benefit())
 
-            #if i > 0 and abs(self.endRSSI) < abs(last_endRssi): 
-             #   zumy_bot.turn90(False)
-              #  zumy_bot.drive_in_dist(True, self.left_wheel,self.right_wheel,drive_time + self.stage_benefit()) 
-               # return               
-
+            if flag: 
+                zumy_bot.turn90(False)
+                zumy_bot.drive_in_dist(True, self.left_wheel,self.right_wheel,drive_time + self.stage_benefit()) 
+                return               
             zumy_bot.turn90()
 
         # stage management   
@@ -96,7 +102,7 @@ class GDscent:
             self.lastRSSI, rssi_list = xb.get_max_rssi()
             print "waiting for signal"
         #print self.lastRSSI
-        while self.lastRSSI > self.stop_rssi:
+        while self.lastRSSI < self.stop_rssi:
             self.calibration()
 
         print "Victory!!!"

@@ -62,7 +62,7 @@ class GAscent:
         bestRSSI = 9999
         #time.sleep(20)
 
-        while bestRSSI == 9999:
+        while bestRSSI == 9999 or bestRSSI == 0:
             bestRSSI, rssi_list = xb.get_max_rssi()
             print bestRSSI
 

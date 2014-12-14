@@ -8,20 +8,30 @@ class LCMBot:
 		self.base_cmd_channel = base_cmd_channel
 		self.msg=base_cmd()
 		self.msg.header = fearing.header()
+
+		self.turn90_time = 0.55
+		self.turn90_left = -.18
+		self.turn90_right = .18
+
 	def drive(self, l, r):
 		self.msg.left_cmd=l
 		self.msg.right_cmd=r
 		self.lcm.publish(self.base_cmd_channel, self.msg.encode())
-	def turn90(self):
+
+	def turn90(self, dir = True):
 		try:
-			self.drive(-.18, .18)
-			time.sleep(0.55)
+			if dir:
+				self.drive(self.turn90_left, self.turn90_right)
+			else:
+				self.drive(-self.turn90_left, -self.turn90_right)
+			time.sleep(self.turn90_time)
 			self.stop()
 		except:
 			self.stop()
 		finally:
 			self.stop()
 			time.sleep(.1)
+
 	def drive_in_dist(self, dir, left, right, t):
 		try:
 			if (dir == True):
@@ -35,6 +45,7 @@ class LCMBot:
 		finally:
 			self.stop()
 			time.sleep(.1)
+			
 	def stop(self):
 		self.drive(0, 0)
 

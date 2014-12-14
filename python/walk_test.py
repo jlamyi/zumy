@@ -4,6 +4,8 @@ from LCMBot import *
 from GAscent import *
 from GDscent import *
 from Xbee_chaining_bot import *
+from GAscent_beta import *
+from GAscent_beta_plus import *
 
 if __name__ == '__main__':
         #file_name = raw_input("Please input the file name: ") 
@@ -14,32 +16,19 @@ if __name__ == '__main__':
         xb = XbRssi('/dev/ttyUSB0')
         xb.start()
 
-        dscending_bot = GDscent(r, xb)
-        dscending_bot.start()
-        '''
-        while True:
-            print xb.data
-            if xb.ascend == True:
-                ascending_bot = GAscent(r, xb)
-                ascending_bot.start()
-                xb.end_gradient_ascend()
-            else: 
-                print "NOT ASCENDING"
-            time.sleep(1)'''
+        try:
+            #ascending_bot = GAscent(r,xb)
+            #ascending_bot.start()
 
-       #s xb.set_transmit_thread(False)
-#	while True:
-#		if xb.get_ascend_status() == True:	
-#        		ascending_bot.start()
-"""            ascend = xb.get_ascend_status()
+            #ascending_bot = GAscent_beta(r,xb)
+            #ascending_bot.start()
 
-            if ascend == True:
-                ascending_bot.start()
-                xb.set_ascend(False)
-     #           xb.set_receiver_thread(False)
-            bestRSSI,rssi_list = xb.get_max_rssi()
-            print xb.sendMessage
-            time.sleep(3)   """
-        	#else:
-        #		sentry_bot.start()
-       
+            ascending_bot = GAscent_beta_plus(r,xb)
+            ascending_bot.start()
+
+            #dscending_bot = GDscent(r, xb)
+            #dscending_bot.start()
+        except:
+            r.stop()
+        finally:
+            r.stop()
