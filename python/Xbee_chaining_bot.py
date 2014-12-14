@@ -12,7 +12,9 @@ class Xbee_chaining_bot(XbRssi):
         self.descend = False
         self.startReceive = True
         self.sendMessage = self.id+'PKT'
+        self.goingSentry = False
         self.cmdList = []
+        self.safeModeCounter = 0
 
     def receive_loop(self):
         while True:
@@ -32,6 +34,8 @@ class Xbee_chaining_bot(XbRssi):
                 if (self.predecessor == self.get_sender_id(msg)):
                     self.transmit = True
                     self.sendingCommand = True
+                    print "BUG"
+                    self.cmdList.append('ASCEND_START')
 
             elif msg.startswith('TRANSMIT_STOP'):
                 print 'Setting transmit flag to false'
@@ -40,31 +44,33 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.startswith('ASCEND_START'):
                 self.ascend = True
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_ASCEND_START'+str(self.rid)
+                self.sendMessage = 'ACK_ASCEND_START-'+str(self.rid)
 
             elif msg.startswith('DESCEND_START'):
                 self.descend = True
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_DESCEND_START'+str(self.rid)
+                self.sendMessage = 'ACK_DESCEND_START-'+str(self.rid)
 
             elif msg.startswith('ARRIVAL'):
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_ARRIVAL'+str(self.rid)
-                self.cmdList.append('TRANSMIT_START')
+                self.goingSentry = True
+                #self.cmdList.append('TRANSMIT_START')
                 if (self.successor == 0):
                     self.successor = self.get_sender_id(msg)
                     print 'Successor is set to'+str(self.successor)
                     self.cmdList.append('SET_PREDECESSOR')
-                self.cmdList.append('ASCEND_START')
+                #self.cmdList.append('ASCEND_START')
 
-            elif msg.startswith('SET_PREDECESSOR'):
+            elif msg.startswith('SET_PRED'):
+                print 'in set pred'
                 self.set_predecessor(msg)
-                self.sendMessage = 'ACK_SET_PREDECESSOR'+str(self.rid)
+                self.sendMessage = 'ACK_SET_PREDECESSOR-'+str(self.rid)
                 self.sendingCommand = True
 
             elif msg.startswith('ACK'):
                 self.sendingCommand = True
-                self.sendMessage = 'STOP_ACK'+str(self.rid)  
+                self.sendMessage = 'STOP_ACK-'+str(self.rid)  
 
             elif msg.startswith('STOP_ACK'):
                 self.sendingCommand = False
@@ -74,8 +80,22 @@ class Xbee_chaining_bot(XbRssi):
                     self.sendingCommand = False
                 if self.sendMessage.isdigit() and msg.isdigit():
                     print "regular transmission"
-                    if len(self.cmdList):
-                        self.send_signal(self.cmdList.pop())
+                    if self.sendingCommand == False:
+                        safe = False
+                        if (safeModeCounter == 0):
+                            safeModeCounter = int(self.sendMessage)
+                        else:
+                            if (safeModeCounter - int(self.sendMessage)) > 0: 
+                                safe = True
+                                safeModeCounter = 0
+                        if (safe):
+                            if len(self.cmdList):
+                                print "COMMAND LIST FUNCTION"
+                                print self.cmdList
+                                self.send_signal(self.cmdList.pop())
+                            else:
+                                if self.goingSentry == True:
+                                    self.transmit = False
         else:
             return 0
 
@@ -108,7 +128,7 @@ class Xbee_chaining_bot(XbRssi):
 
     def set_predecessor(self, msg):
         if (self.predecessor == 0):
-            self.predecessor = self.get_sender_id(msg)
+            self.predecessor = int(self.get_sender_id(msg))
             print 'Predecessor is set to'+str(self.predecessor)
 
     def chain_next_bot(self, msg):
@@ -122,7 +142,7 @@ class Xbee_chaining_bot(XbRssi):
 
     def get_sender_id(self, msg):
         start_index = msg.index('-')
-        return msg[start_index:]
+        return msg[start_index+1:]
 
 if __name__=='__main__':
     xb = Xbee_chiaing_bot('/dev/ttyUSB0')

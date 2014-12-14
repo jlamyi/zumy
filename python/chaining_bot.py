@@ -20,6 +20,8 @@ if __name__ == '__main__':
                 ascending_bot = GAscent(r, xb)
                 ascending_bot.start()
                 xb.end_gradient_ascend()
+            else: 
+                print "NOT ASCENDING"
             time.sleep(1)
 
        #s xb.set_transmit_thread(False)

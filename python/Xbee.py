@@ -48,13 +48,15 @@ class XbRssi:
     # transmitter
     def transmit_rssi(self):
         # print "Sending packet #",self.pktNum
-        # if (self.transmit == True):
+        if (self.transmit == True):
             # message = ''.join(['Hello #', repr(self.pktNum)] )
-        if (self.sendingCommand == False):
-            self.sendMessage = repr(self.pktNum)
-        self.xbee.tx(dest_addr='\xFF\xFF', data = self.sendMessage)
-        self.pktNum = self.pktNum + 1
-        time.sleep(.1)
+            if (self.sendingCommand == False):
+                self.sendMessage = repr(self.pktNum)
+            self.xbee.tx(dest_addr='\xFF\xFF', data = self.sendMessage)
+            self.pktNum = self.pktNum + 1
+            time.sleep(.1)
+        else:
+            time.sleep(5)
 
     # receiver
     def get_rssi_list(self):
@@ -109,10 +111,6 @@ class XbRssi:
     def __del__ (self):
         self.ser.close()
 
-    ######## what is this function for??
-    def read_byte(self):
-        self.newest_byte = self.ser.read()
-        return self.newest_byte
 
 if __name__=='__main__':
     xb = XbRssi('/dev/ttyUSB0')

@@ -74,7 +74,7 @@ class GDscent:
         while bestRSSI == 9999:
             bestRSSI, rssi_list = xb.get_max_rssi()
 
-        print "current bestRSSI: ", bestRSSI
+        print "Begin navigation and the initial starting point rssi is:  ", bestRSSI
         while bestRSSI > -70:
             bestRSSI, counter = self.calibration(bestRSSI, counter) 
 
