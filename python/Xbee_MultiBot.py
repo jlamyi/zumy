@@ -15,6 +15,23 @@ class Xbee_MultiBot(XbRssi):
         self.sendMessage = self.id+'PKT'
         self.cmdList = []
         '''
+    
+    def show_connections(self):
+        connections = []
+
+        sender_id = self.get_sender_id(self.data)
+        connections.append(sender_id)
+
+        for i in range(50): 
+
+            sender_id = self.get_sender_id(self.data)
+
+            if sender_id not in connections:
+                connections.append(sender_id)
+
+            time.sleep(.01)
+
+        return connections
 
     # receiver
     def get_rssi_list(self, bot_id):

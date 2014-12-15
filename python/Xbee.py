@@ -18,16 +18,19 @@ class XbRssi:
         self.updateTransmitThread.daemon = True
         self.updateReceiveThread = threading.Thread(target=self.receive_loop)
         self.updateReceiveThread.daemon = True
+
         self.response = 0
         self.rssi = 0
         self.addr = 0
         self.data = 0
         self.sendMessage = ''
         self.transmit = True
+
         #self.response = self.xbee.wait_read_frame()
         #self.rssi = -ord(self.response.get('rssi'))
         #self.addr = ord(self.response.get('source_addr')[1])
         #self.data = self.response.get('rf_data')
+
         self.pktNum = 0
         self.sendingCommand = False
         self.ser.flush()
@@ -46,13 +49,13 @@ class XbRssi:
             self.data = self.response.get('rf_data')
             #print self.data + ", RSSI = %d dBm @ address %d" % ( self.rssi, self.addr )
     
-    # transmitter
+    # transmitter function
     def transmit_rssi(self):
         if (self.transmit == True):
             if (self.sendingCommand == False):
-                msg = self.get_packet_prefix()
+                msg = self.build_packet_prefix()
             else:
-                msg = self.get_packet_prefix() + self.sendMessage
+                msg = self.build_packet_prefix() + self.sendMessage
             print "Sending Msg:" + msg
             self.xbee.tx(dest_addr='\xFF\xFF', data = msg)
             self.pktNum = self.pktNum + 1
@@ -61,19 +64,25 @@ class XbRssi:
         else:
             time.sleep(5)
 
-    # receiver
+    # get 30 received rssi values
     def get_rssi_list(self):
         rssi_list = []
-        data_list = []
+        index_list = []
+        
         rssi_list.append(self.rssi)
-        data_list.append(self.data)
+        index_list.append(self.get_index(self.data))
+
         i = 1
-        while i<30:
-            if self.data != data_list[-1]:
+        while i < 30:
+            index = self.get_index(self.data)
+
+            if index != index_list[-1]:
                 rssi_list.append(self.rssi)
-                data_list.append(self.data)
+                index_list.append(index)
                 i = i + 1
-            time.sleep(.1)
+
+            time.sleep(.01)
+
         return rssi_list
 
     # data processing functions
@@ -97,9 +106,11 @@ class XbRssi:
         rssi_avg = mean(rssi_list)
         return rssi_avg, rssi_list
 
-    def get_packet_prefix(self):
+    # build packet prefix
+    def build_packet_prefix(self):
         return repr(self.pktNum) + "-" + str(self.rid) + "~" 
 
+    # get specific data from a message
     def get_sender_id(self, msg):
         sender_start_index = msg.index('-')
         sender_end_index = msg.index('~')

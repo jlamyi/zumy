@@ -26,7 +26,7 @@ class Xbee_chaining_bot(XbRssi):
 
     def decode_msg(self):
         if (self.response != 0):
-            msg =  self.data
+            msg =  self.get_command(self.data)
             print msg
             if msg.endswith('TRANSMIT_START'):
                 if (self.predecessor == self.get_sender_id(msg)):
@@ -42,12 +42,12 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.endswith('ASCEND_START'):
                 self.ascend = True
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_ASCEND_START-'
+                self.sendMessage = 'ACK_ASCEND_START'
 
             elif msg.endswith('DESCEND_START'):
                 self.descend = True
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_DESCEND_START-'
+                self.sendMessage = 'ACK_DESCEND_START'
 
             elif msg.endswith('ARRIVAL'):
                 self.sendingCommand = True
@@ -63,15 +63,16 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.endswith('SET_PRED'):
                 print 'in set pred'
                 self.set_predecessor(msg)
-                self.sendMessage = 'ACK_SET_PREDECESSOR-'
+                self.sendMessage = 'ACK_SET_PREDECESSOR'
                 self.sendingCommand = True
-
-            elif msg.endswith('ACK'):
-                self.sendingCommand = True
-                self.sendMessage = 'STOP_ACK-'  
 
             elif msg.endswith('STOP_ACK'):
                 self.sendingCommand = False
+
+            elif 'ACK' in msg:
+                print "ACKED"
+                self.sendingCommand = True
+                self.sendMessage = 'STOP_ACK'  
                 
             else:
                 if self.sendMessage.endswith('STOP_ACK'):
