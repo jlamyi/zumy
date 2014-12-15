@@ -66,7 +66,7 @@ class XbRssi:
         rssi_list = []
         data_list = []
         rssi_list.append(self.rssi)
-        data_list.append(self.get_dataself.data)
+        data_list.append(self.data)
         i = 1
         while i<30:
             if self.data != data_list[-1]:
