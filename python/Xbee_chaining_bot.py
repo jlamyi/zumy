@@ -12,6 +12,7 @@ class Xbee_chaining_bot(XbRssi):
         self.startReceive = True
         self.goingSentry = False
         self.cmdList = []
+        self.cmdHist = []
         self.safeModeCounter = 0
 
     def receive_loop(self):
@@ -26,6 +27,8 @@ class Xbee_chaining_bot(XbRssi):
 
     def decode_msg(self):
         if (self.response != 0):
+            msg = self.data
+            self.cmdHist.append(msg)
             msg =  self.get_command(self.data)
             print msg
             if msg.startswith('TRANSMIT_START'):
@@ -52,7 +55,7 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.startswith('ARRIVAL'):
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_ARRIVAL'
-                self.goingSentry = True
+                #self.goingSentry = True
                 #self.cmdList.append('TRANSMIT_START')
                 if (self.successor == 0):
                     self.successor = self.get_sender_id(msg)
@@ -70,21 +73,24 @@ class Xbee_chaining_bot(XbRssi):
                 self.sendingCommand = False
 
             elif msg.startswith('ACK'):
-                print "ACKED"
                 self.sendingCommand = True
                 self.sendMessage = 'STOP_ACK'  
                 
             else:
-                if self.sendMessage.endswith('STOP_ACK'):
+                print 'INELSE'
+                if self.sendMessage.startswith('STOP_ACK'):
+                    print "End cycle"
                     self.sendingCommand = False
-                if self.sendMessage.isdigit() and msg.isdigit():
+                    self.sendMessage = ''
+
+                if (len(self.sendMessage) == 0 and len(msg) == 0):
                     print "regular transmission"
                     if self.sendingCommand == False:
                         safe = False
-                        if (safeModeCounter == 0):
-                            safeModeCounter = int(self.sendMessage)
+                        if (self.safeModeCounter == 0):
+                            safeModeCounter = self.pktNum
                         else:
-                            if (safeModeCounter - int(self.sendMessage)) > 0: 
+                            if (self.safeModeCounter - int(self.pktNum)) > 0: 
                                 safe = True
                                 safeModeCounter = 0
                         if (safe):
@@ -95,6 +101,7 @@ class Xbee_chaining_bot(XbRssi):
                             else:
                                 if self.goingSentry == True:
                                     self.transmit = False
+
         else:
             return 0
 

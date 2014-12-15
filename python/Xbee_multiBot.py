@@ -2,7 +2,7 @@ import time, threading, serial
 from numpy import *
 from Xbee import XbRssi
 
-class Xbee_MultiBot(XbRssi):
+class Xbee_multiBot(XbRssi):
     def __init__(self,serial_port): 
         XbRssi.__init__(self,serial_port)  
         '''      
@@ -20,6 +20,8 @@ class Xbee_MultiBot(XbRssi):
         connections = []
 
         sender_id = self.get_sender_id(self.data)
+        if sender_id == "NO_SENDER":
+            return connections
         connections.append(sender_id)
 
         for i in range(50): 

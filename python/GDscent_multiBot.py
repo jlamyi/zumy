@@ -1,7 +1,7 @@
 import time
 from GDscent import *
 
-class GDscent_MultiBot(GDscent):
+class GDscent_multiBot(GDscent):
     def __init__(self, zumy, xbee_multiBot):
         self.r = zumy
         self.xb = xbee_multiBot
@@ -12,8 +12,9 @@ class GDscent_MultiBot(GDscent):
         self.counter_threshold = 1
         self.counter = 0
 
-        self.connections = self.xb.show_connections()
-        self.stop_rssi = (-60) * len(self.connections)
+        self.connections = []
+        self.single_stop_rssi = -40
+        self.stop_rssi = 0
 
         self.lastRSSI = 9999
         self.newRSSI = 0
@@ -27,7 +28,11 @@ class GDscent_MultiBot(GDscent):
     def stage_benefit(self):
         return self.counter*0.3
     '''
-
+    
+    def set_connections(self):
+        self.connections = self.xb.show_connections()
+        if len(self.connections) != 0:
+            self.stop_rssi = (self.single_stop_rssi) * len(self.connections)
     # collect the rssi value, and save it in self.newRSSI
     def measure_rssi(self,msg):
 
@@ -97,16 +102,22 @@ class GDscent_MultiBot(GDscent):
             self.counter = 0
 
         return 
-
+    '''
     def start(self):
     
         print "Start.... Welcome to the new age!"
         xb = self.xb
 
+        self.set_connections()
         #time.sleep(20)
+        while len(self.connections) == 0:
+            print "waiting for connections"
+            self.set_connections()
+
+        print "Connections:", self.connections
 
         while self.lastRSSI == 9999 or self.lastRSSI == 0:
-            self.lastRSSI, rssi_list = xb.get_max_rssi()
+            self.lastRSSI, rssi_list = xb.get_max_rssi(self.connections[0])
             print "waiting for signal"
         #print self.lastRSSI
         while self.lastRSSI > self.stop_rssi:
@@ -116,7 +127,7 @@ class GDscent_MultiBot(GDscent):
         self.r.stop()
 
         print "Exit GDscend"
-    '''
+    
 
 
         

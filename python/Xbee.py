@@ -111,17 +111,29 @@ class XbRssi:
 
     # get specific data from a message
     def get_sender_id(self, msg):
-        sender_start_index = msg.index('-')
-        sender_end_index = msg.index('~')
-        return msg[sender_start_index+1:sender_end_index]
+        if msg == 0:
+            return 'NO_SENDER'
+        else:
+            try:
+                sender_start_index = msg.index('-')
+                sender_end_index = msg.index('~')
+                return msg[sender_start_index+1:sender_end_index]
+            except:
+                print "SENDER_ID_ERROR: " + msg
 
     def get_index(self, msg):
-        index_end_index = msg.index('-')
-        return msg[:index_end_index]
+        if msg == 0:
+            return 'NO_INDEX'
+        else:
+            index_end_index = msg.index('-')
+            return msg[:index_end_index]
 
     def get_command(self, msg):
-        cmd_start_index = msg.index('~')
-        return msg[cmd_start_index+1:]
+        if msg == 0:
+            return 'NO_COMMAND'
+        else:
+            cmd_start_index = msg.index('~')
+            return msg[cmd_start_index+1:]
 
     # start threading
     def start(self):
