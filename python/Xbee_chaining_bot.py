@@ -7,11 +7,9 @@ class Xbee_chaining_bot(XbRssi):
         XbRssi.__init__(self,serial_port)        
         self.predecessor = 0
         self.successor = 0
-        self.transmit = True
         self.ascend = False
         self.descend = False
         self.startReceive = True
-        self.sendMessage = self.id+'PKT'
         self.goingSentry = False
         self.cmdList = []
         self.safeModeCounter = 0
@@ -30,30 +28,30 @@ class Xbee_chaining_bot(XbRssi):
         if (self.response != 0):
             msg =  self.data
             print msg
-            if msg.startswith('TRANSMIT_START'):
+            if msg.endswith('TRANSMIT_START'):
                 if (self.predecessor == self.get_sender_id(msg)):
                     self.transmit = True
                     self.sendingCommand = True
                     print "BUG"
                     self.cmdList.append('ASCEND_START')
 
-            elif msg.startswith('TRANSMIT_STOP'):
+            elif msg.endswith('TRANSMIT_STOP'):
                 print 'Setting transmit flag to false'
                 self.transmit = False 
 
-            elif msg.startswith('ASCEND_START'):
+            elif msg.endswith('ASCEND_START'):
                 self.ascend = True
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_ASCEND_START-'+str(self.rid)
+                self.sendMessage = 'ACK_ASCEND_START-'
 
-            elif msg.startswith('DESCEND_START'):
+            elif msg.endswith('DESCEND_START'):
                 self.descend = True
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_DESCEND_START-'+str(self.rid)
+                self.sendMessage = 'ACK_DESCEND_START-'
 
-            elif msg.startswith('ARRIVAL'):
+            elif msg.endswith('ARRIVAL'):
                 self.sendingCommand = True
-                self.sendMessage = 'ACK_ARRIVAL'+str(self.rid)
+                self.sendMessage = 'ACK_ARRIVAL'
                 self.goingSentry = True
                 #self.cmdList.append('TRANSMIT_START')
                 if (self.successor == 0):
@@ -62,21 +60,21 @@ class Xbee_chaining_bot(XbRssi):
                     self.cmdList.append('SET_PREDECESSOR')
                 #self.cmdList.append('ASCEND_START')
 
-            elif msg.startswith('SET_PRED'):
+            elif msg.endswith('SET_PRED'):
                 print 'in set pred'
                 self.set_predecessor(msg)
-                self.sendMessage = 'ACK_SET_PREDECESSOR-'+str(self.rid)
+                self.sendMessage = 'ACK_SET_PREDECESSOR-'
                 self.sendingCommand = True
 
-            elif msg.startswith('ACK'):
+            elif msg.endswith('ACK'):
                 self.sendingCommand = True
-                self.sendMessage = 'STOP_ACK-'+str(self.rid)  
+                self.sendMessage = 'STOP_ACK-'  
 
-            elif msg.startswith('STOP_ACK'):
+            elif msg.endswith('STOP_ACK'):
                 self.sendingCommand = False
                 
             else:
-                if self.sendMessage.startswith('STOP_ACK'):
+                if self.sendMessage.endswith('STOP_ACK'):
                     self.sendingCommand = False
                 if self.sendMessage.isdigit() and msg.isdigit():
                     print "regular transmission"
@@ -100,7 +98,7 @@ class Xbee_chaining_bot(XbRssi):
             return 0
 
     def send_signal(self, msg):
-        self.sendMessage = msg + '-'+str(self.rid)
+        self.sendMessage = msg
         self.sendingCommand = True
         while(self.sendingCommand == True):
             print self.data

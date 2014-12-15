@@ -1,15 +1,15 @@
 import zc_id
-from Xbee import *
 from LCMBot import *
+
+from Xbee import *
+from Xbee_chaining_bot import *
+
 from GAscent import *
 from GDscent import *
-from Xbee_chaining_bot import *
 from GAscent_beta import *
 from GAscent_beta_plus import *
 
 if __name__ == '__main__':
-        #file_name = raw_input("Please input the file name: ") 
-        #f = open(file_name+".csv","w")
 
         rid = zc_id.get_id()
         r = LCMBot('{0}/base_cmd'.format(rid))
@@ -20,11 +20,11 @@ if __name__ == '__main__':
             #ascending_bot = GAscent(r,xb)
             #ascending_bot.start()
 
-            #ascending_bot = GAscent_beta(r,xb)
-            #ascending_bot.start()
-
-            ascending_bot = GAscent_beta_plus(r,xb)
+            ascending_bot = GAscent_beta(r,xb)
             ascending_bot.start()
+
+            #ascending_bot = GAscent_beta_plus(r,xb)
+            #ascending_bot.start()
 
             #dscending_bot = GDscent(r, xb)
             #dscending_bot.start()

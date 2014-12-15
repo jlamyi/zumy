@@ -22,14 +22,14 @@ class XbRssi:
         self.rssi = 0
         self.addr = 0
         self.data = 0
+        self.sendMessage = ''
+        self.transmit = True
         #self.response = self.xbee.wait_read_frame()
         #self.rssi = -ord(self.response.get('rssi'))
         #self.addr = ord(self.response.get('source_addr')[1])
         #self.data = self.response.get('rf_data')
         self.pktNum = 0
         self.sendingCommand = False
-        # self.buffer = ['0']
-        # self.newest_byte = '0'
         self.ser.flush()
 
     # define transmit and receive loop
@@ -37,6 +37,7 @@ class XbRssi:
         while True:
             self.transmit_rssi()
             time.sleep(.2)
+
     def receive_loop(self):
         while True:
             self.response = self.xbee.wait_read_frame()
@@ -47,14 +48,16 @@ class XbRssi:
     
     # transmitter
     def transmit_rssi(self):
-        # print "Sending packet #",self.pktNum
         if (self.transmit == True):
-            # message = ''.join(['Hello #', repr(self.pktNum)] )
             if (self.sendingCommand == False):
-                self.sendMessage = repr(self.pktNum)
-            self.xbee.tx(dest_addr='\xFF\xFF', data = self.sendMessage)
+                msg = self.get_packet_prefix()
+            else:
+                msg = self.get_packet_prefix() + self.sendMessage
+            print "Sending Msg:" + msg
+            self.xbee.tx(dest_addr='\xFF\xFF', data = msg)
             self.pktNum = self.pktNum + 1
             time.sleep(.1)
+            #self.sendMessage = ''
         else:
             time.sleep(5)
 
@@ -66,8 +69,6 @@ class XbRssi:
         data_list.append(self.data)
         i = 1
         while i<30:
-           # print i
-           # print self.data
             if self.data != data_list[-1]:
                 rssi_list.append(self.rssi)
                 data_list.append(self.data)
@@ -79,31 +80,29 @@ class XbRssi:
     def get_max_rssi(self):
         rssi_list = self.get_rssi_list()
         rssi_max = max(rssi_list)
-        # print rssi_list
-        # print "rssi_max = " + str(rssi_max)
         return rssi_max, rssi_list
+
     def get_min_rssi(self):
         rssi_list = self.get_rssi_list()
         rssi_min = min(rssi_list)
-        # print rssi_list
-        # print "rssi_min = " + str(rssi_min)
         return rssi_min, rssi_list
+
     def get_med_rssi(self):
         rssi_list = self.get_rssi_list()
         rssi_med = median(rssi_list)
-        # print rssi_list
-        # print "rssi_med = " + str(rssi_med)
         return rssi_med, rssi_list
+
     def get_avg_rssi(self):
         rssi_list = self.get_rssi_list()
         rssi_avg = mean(rssi_list)
-        # print rssi_list
-        # print "rssi_avg = " + str(rssi_avg)
         return rssi_avg, rssi_list
+
+    def get_packet_prefix(self):
+        return repr(self.pktNum) + "-" + str(self.rid) + "~" 
 
     # start threading
     def start(self):
-        #self.updateTransmitThread.start()
+        self.updateTransmitThread.start()
         self.updateReceiveThread.start()
 
     def close(self):
