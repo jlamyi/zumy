@@ -57,12 +57,15 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.startswith('ARRIVAL'):
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_ARRIVAL'
-                #self.goingSentry = True
-                #self.cmdList.append('TRANSMIT_START')
+                self.goingSentry = True
+                
                 if (self.successor == 0):
                     self.successor = self.get_sender_id(msg)
                     print 'Successor is set to'+str(self.successor)
                     self.cmdList.append('SET_PREDECESSOR')
+                else:
+                    self.cmdList.append('TRANSMIT_START')
+
                 self.cmdList.append('ASCEND_START')
 
             elif msg.startswith('SET_PRED'):
@@ -81,7 +84,6 @@ class Xbee_chaining_bot(XbRssi):
                 self.startCommandPkt = self.pktNum
                 
             else:
-                print 'INELSE'
                 if self.sendMessage.startswith('STOP_ACK'):
                     if self.pktNum > self.startCommandPkt+2:
                         print "End cycle"
@@ -137,6 +139,9 @@ class Xbee_chaining_bot(XbRssi):
 
     def send_start_ascend_signal(self):
         self.send_signal('ASCEND_START')
+
+    def send_change_channel_signal(self):
+        self.send_signal('CHANGE_CHANNEL')
 
     def end_gradient_ascend(self):
         self.ascend = False
