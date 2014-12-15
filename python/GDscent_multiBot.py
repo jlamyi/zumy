@@ -14,7 +14,7 @@ class GDscent_multiBot(GDscent):
 
         self.connections = []
         self.single_stop_rssi = -40
-        self.stop_rssi = 0
+        self.stop_rssi = -40
 
         self.lastRSSI = 9999
         self.newRSSI = 0
@@ -31,8 +31,8 @@ class GDscent_multiBot(GDscent):
     
     def set_connections(self):
         self.connections = self.xb.show_connections()
-        if len(self.connections) != 0:
-            self.stop_rssi = (self.single_stop_rssi) * len(self.connections)
+        #if len(self.connections) != 0:
+        #    self.stop_rssi = (self.single_stop_rssi) * len(self.connections)
     # collect the rssi value, and save it in self.newRSSI
     def measure_rssi(self,msg):
 
@@ -41,6 +41,7 @@ class GDscent_multiBot(GDscent):
             rssi, rssi_list = self.xb.get_max_rssi(self.connections[i])
             self.newRSSI = self.newRSSI + rssi
 
+        self.newRSSI = self.newRSSI / len(self.connections)
         print str(msg) + ": ", self.newRSSI
     
     # check if this algorithm should end

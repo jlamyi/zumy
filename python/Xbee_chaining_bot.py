@@ -14,6 +14,7 @@ class Xbee_chaining_bot(XbRssi):
         self.cmdList = []
         self.cmdHist = []
         self.safeModeCounter = 0
+        self.startCommandPkt = 0
 
     def receive_loop(self):
         while True:
@@ -31,6 +32,7 @@ class Xbee_chaining_bot(XbRssi):
             self.cmdHist.append(msg)
             msg =  self.get_command(self.data)
             print msg
+            print self.cmdHist
             if msg.startswith('TRANSMIT_START'):
                 if (self.predecessor == self.get_sender_id(msg)):
                     self.transmit = True
@@ -75,13 +77,15 @@ class Xbee_chaining_bot(XbRssi):
             elif msg.startswith('ACK'):
                 self.sendingCommand = True
                 self.sendMessage = 'STOP_ACK'  
+                self.startCommandPkt = self.pktNum
                 
             else:
                 print 'INELSE'
                 if self.sendMessage.startswith('STOP_ACK'):
-                    print "End cycle"
-                    self.sendingCommand = False
-                    self.sendMessage = ''
+                    if self.pktNum > self.startCommandPkt+2:
+                        print "End cycle"
+                        self.sendingCommand = False
+                        self.sendMessage = ''
 
                 if (len(self.sendMessage) == 0 and len(msg) == 0):
                     print "regular transmission"

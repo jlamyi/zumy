@@ -21,7 +21,7 @@ if __name__ == '__main__':
                 ascending_bot.start()
                 xb.end_gradient_ascend()
             else: 
-                xb.collect_max_rssi()
+                xb.get_max_rssi()
                 print "NOT ASCENDING"
             time.sleep(1)
 

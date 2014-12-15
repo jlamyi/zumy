@@ -58,7 +58,7 @@ class Xbee_multiBot(XbRssi):
                 index_list.append(pkt_index)
                 i = i + 1
 
-            time.sleep(.1)
+            time.sleep(.01)
         return rssi_list
 
     # data processing functions
