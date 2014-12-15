@@ -63,7 +63,7 @@ class Xbee_chaining_bot(XbRssi):
                     self.successor = self.get_sender_id(msg)
                     print 'Successor is set to'+str(self.successor)
                     self.cmdList.append('SET_PREDECESSOR')
-                #self.cmdList.append('ASCEND_START')
+                self.cmdList.append('ASCEND_START')
 
             elif msg.startswith('SET_PRED'):
                 print 'in set pred'
@@ -73,6 +73,7 @@ class Xbee_chaining_bot(XbRssi):
 
             elif msg.startswith('STOP_ACK'):
                 self.sendingCommand = False
+                self.sendMessage = ''
 
             elif msg.startswith('ACK'):
                 self.sendingCommand = True
@@ -90,18 +91,23 @@ class Xbee_chaining_bot(XbRssi):
                 if (len(self.sendMessage) == 0 and len(msg) == 0):
                     print "regular transmission"
                     if self.sendingCommand == False:
+
                         safe = False
                         if (self.safeModeCounter == 0):
-                            safeModeCounter = self.pktNum
+                            print 'set safe counter'
+                            print self.cmdList
+                            self.safeModeCounter = self.pktNum
                         else:
-                            if (self.safeModeCounter - int(self.pktNum)) > 0: 
+                            if (int(self.pktNum) - self.safeModeCounter) > 3: 
+                                print 'safe for next command'
                                 safe = True
-                                safeModeCounter = 0
+                                self.safeModeCounter = 0
                         if (safe):
                             if len(self.cmdList):
                                 print "COMMAND LIST FUNCTION"
                                 print self.cmdList
-                                self.send_signal(self.cmdList.pop())
+                                self.sendMessage = self.cmdList.pop()
+                                self.sendingCommand = True
                             else:
                                 if self.goingSentry == True:
                                     self.transmit = False
