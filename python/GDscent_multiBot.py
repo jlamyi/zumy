@@ -2,9 +2,9 @@ import time
 from GDscent import *
 
 class GDscent_MultiBot(GDscent):
-    def __init__(self, zumy, xbee):
+    def __init__(self, zumy, xbee_multiBot):
         self.r = zumy
-        self.xb = xbee
+        self.xb = xbee_multiBot
 
         self.left_wheel = 0.22
         self.right_wheel = 0.2
@@ -20,24 +20,34 @@ class GDscent_MultiBot(GDscent):
         self.startRSSI = 0
         self.endRSSI = 0
 
+    '''
     def drive_time_function(self):
         return (abs(self.lastRSSI)-40)*0.05 + 0.2
 
     def stage_benefit(self):
         return self.counter*0.3
+    '''
 
     # collect the rssi value, and save it in self.newRSSI
     def measure_rssi(self,msg):
-        self.newRSSI, rssi_list = self.xb.get_max_rssi()
+
+        self.newRSSI = 0
+        for i in range(len(self.connections)):
+            rssi, rssi_list = self.xb.get_max_rssi(self.connections[i])
+            self.newRSSI = self.newRSSI + rssi
+
         print str(msg) + ": ", self.newRSSI
     
     # check if this algorithm should end
+    '''
     def check_end(self):
         if self.newRSSI < self.stop_rssi:
             self.lastRSSI = self.newRSSI
             return True
         return False 
+    '''
 
+    '''
     def calibration(self):
         zumy_bot = self.r
         xb_bot = self.xb
@@ -106,6 +116,7 @@ class GDscent_MultiBot(GDscent):
         self.r.stop()
 
         print "Exit GDscend"
+    '''
 
 
         

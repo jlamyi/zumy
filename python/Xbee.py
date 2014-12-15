@@ -56,11 +56,10 @@ class XbRssi:
                 msg = self.build_packet_prefix()
             else:
                 msg = self.build_packet_prefix() + self.sendMessage
-            print "Sending Msg:" + msg
+            #print "Sending Msg:" + msg
             self.xbee.tx(dest_addr='\xFF\xFF', data = msg)
             self.pktNum = self.pktNum + 1
             time.sleep(.1)
-            #self.sendMessage = ''
         else:
             time.sleep(5)
 
@@ -121,7 +120,7 @@ class XbRssi:
         return msg[:index_end_index]
 
     def get_command(self, msg):
-        cmd_start_index = msg.index('$')
+        cmd_start_index = msg.index('~')
         return msg[cmd_start_index+1:]
 
     # start threading

@@ -28,28 +28,28 @@ class Xbee_chaining_bot(XbRssi):
         if (self.response != 0):
             msg =  self.get_command(self.data)
             print msg
-            if msg.endswith('TRANSMIT_START'):
+            if msg.startswith('TRANSMIT_START'):
                 if (self.predecessor == self.get_sender_id(msg)):
                     self.transmit = True
                     self.sendingCommand = True
                     print "BUG"
                     self.cmdList.append('ASCEND_START')
 
-            elif msg.endswith('TRANSMIT_STOP'):
+            elif msg.startswith('TRANSMIT_STOP'):
                 print 'Setting transmit flag to false'
                 self.transmit = False 
 
-            elif msg.endswith('ASCEND_START'):
+            elif msg.startswith('ASCEND_START'):
                 self.ascend = True
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_ASCEND_START'
 
-            elif msg.endswith('DESCEND_START'):
+            elif msg.startswith('DESCEND_START'):
                 self.descend = True
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_DESCEND_START'
 
-            elif msg.endswith('ARRIVAL'):
+            elif msg.startswith('ARRIVAL'):
                 self.sendingCommand = True
                 self.sendMessage = 'ACK_ARRIVAL'
                 self.goingSentry = True
@@ -60,16 +60,16 @@ class Xbee_chaining_bot(XbRssi):
                     self.cmdList.append('SET_PREDECESSOR')
                 #self.cmdList.append('ASCEND_START')
 
-            elif msg.endswith('SET_PRED'):
+            elif msg.startswith('SET_PRED'):
                 print 'in set pred'
                 self.set_predecessor(msg)
                 self.sendMessage = 'ACK_SET_PREDECESSOR'
                 self.sendingCommand = True
 
-            elif msg.endswith('STOP_ACK'):
+            elif msg.startswith('STOP_ACK'):
                 self.sendingCommand = False
 
-            elif 'ACK' in msg:
+            elif msg.startswith('ACK'):
                 print "ACKED"
                 self.sendingCommand = True
                 self.sendMessage = 'STOP_ACK'  
