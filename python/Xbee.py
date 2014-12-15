@@ -66,7 +66,7 @@ class XbRssi:
         rssi_list = []
         data_list = []
         rssi_list.append(self.rssi)
-        data_list.append(self.data)
+        data_list.append(self.get_dataself.data)
         i = 1
         while i<30:
             if self.data != data_list[-1]:
@@ -99,6 +99,19 @@ class XbRssi:
 
     def get_packet_prefix(self):
         return repr(self.pktNum) + "-" + str(self.rid) + "~" 
+
+    def get_sender_id(self, msg):
+        sender_start_index = msg.index('-')
+        sender_end_index = msg.index('~')
+        return msg[sender_start_index+1:sender_end_index]
+
+    def get_index(self, msg):
+        index_end_index = msg.index('-')
+        return msg[:index_end_index]
+
+    def get_command(self, msg):
+        cmd_start_index = msg.index('$')
+        return msg[cmd_start_index+1:]
 
     # start threading
     def start(self):

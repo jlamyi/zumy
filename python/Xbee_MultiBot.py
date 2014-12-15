@@ -19,50 +19,50 @@ class Xbee_MultiBot(XbRssi):
     # receiver
     def get_rssi_list(self, bot_id):
         rssi_list = []
-        data_list = []
+        index_list = []
+
+        msg = self.data
+        pkt_index = self.get_index(msg)
+
         rssi_list.append(self.rssi)
-        data_list.append(self.data)
+        index_list.append(pkt_index)
+
         i = 1
-        while i<30:
-           # print i
-           # print self.data
-            if self.data != data_list[-1] and bot_id == ???:
+        while i<30:  
+
+            msg = self.data
+            sender_id = self.get_sender_id(msg)
+            pkt_index = self.get_index(msg)
+
+            if pkt_index != index_list[-1] and bot_id == sender_id:
                 rssi_list.append(self.rssi)
-                data_list.append(self.data)
+                index_list.append(pkt_index)
                 i = i + 1
+
             time.sleep(.1)
         return rssi_list
 
     # data processing functions
-    '''def get_max_rssi(self,bot_id):
+    def get_max_rssi(self,bot_id):
         rssi_list = self.get_rssi_list(bot_id)
         rssi_max = max(rssi_list)
-        # print rssi_list
-        # print "rssi_max = " + str(rssi_max)
         return rssi_max, rssi_list
+
     def get_min_rssi(self,bot_id):
         rssi_list = self.get_rssi_list(bot_id)
         rssi_min = min(rssi_list)
-        # print rssi_list
-        # print "rssi_min = " + str(rssi_min)
         return rssi_min, rssi_list
+
     def get_med_rssi(self,bot_id):
         rssi_list = self.get_rssi_list(bot_id)
         rssi_med = median(rssi_list)
-        # print rssi_list
-        # print "rssi_med = " + str(rssi_med)
         return rssi_med, rssi_list
+
     def get_avg_rssi(self,bot_id):
         rssi_list = self.get_rssi_list(bot_id)
         rssi_avg = mean(rssi_list)
-        # print rssi_list
-        # print "rssi_avg = " + str(rssi_avg)
         return rssi_avg, rssi_list
 
-    def get_sender_id(self, msg):
-        start_index = msg.index('-')
-        return msg[start_index+1:]'''
-   
 '''
 if __name__=='__main__':
     xb = Xbee_chiaing_bot('/dev/ttyUSB0')

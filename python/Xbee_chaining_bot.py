@@ -138,10 +138,6 @@ class Xbee_chaining_bot(XbRssi):
         self.send_start_ascend_signal()
         self.transmit = False
 
-    def get_sender_id(self, msg):
-        start_index = msg.index('-')
-        return msg[start_index+1:]
-
 if __name__=='__main__':
     xb = Xbee_chiaing_bot('/dev/ttyUSB0')
 
