@@ -5,8 +5,8 @@ from Xbee import XbRssi
 class Xbee_chaining_bot(XbRssi):
     def __init__(self,serial_port): 
         XbRssi.__init__(self,serial_port)        
-        self.predecessor = 0
-        self.successor = 0
+        self.predecessor = int(self.rid) - 1
+        self.successor = int(self.rid) + 1
         self.ascend = False
         self.descend = False
         self.startReceive = True
@@ -15,6 +15,7 @@ class Xbee_chaining_bot(XbRssi):
         self.cmdHist = []
         self.safeModeCounter = 0
         self.startCommandPkt = 0
+
 
     # self.decode_msg() is added in receive_loop
     def receive_loop(self):
@@ -29,8 +30,8 @@ class Xbee_chaining_bot(XbRssi):
 
     def decode_msg(self):
         if (self.response != 0):
-            msg = self.data
-            self.cmdHist.append(msg)
+            data = self.data
+            self.cmdHist.append(data)
             msg =  self.get_command(self.data)
             print msg
             print self.cmdHist
@@ -75,7 +76,7 @@ class Xbee_chaining_bot(XbRssi):
 
             elif msg.startswith('SET_PRED'):
                 print 'in set pred'
-                self.set_predecessor(msg)
+                self.set_predecessor(data)
                 self.sendMessage = 'ACK_SET_PREDECESSOR'
                 self.sendingCommand = True
 
