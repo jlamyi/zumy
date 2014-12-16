@@ -1,9 +1,8 @@
-            
 import time, threading, serial, zc_id
 from xbee import XBee
 from numpy import *
 
-class XbRssi:
+class XbRssi(object):
     # initialization
     def __init__(self, serial_port): 
         self.ser = serial.Serial(serial_port, 57600)
@@ -39,7 +38,7 @@ class XbRssi:
     def transmit_loop(self):
         while True:
             self.transmit_rssi()
-            time.sleep(.2)
+            time.sleep(.2) # need to be adjusted??
 
     def receive_loop(self):
         while True:

@@ -16,6 +16,7 @@ class Xbee_chaining_bot(XbRssi):
         self.safeModeCounter = 0
         self.startCommandPkt = 0
 
+    # self.decode_msg() is added in receive_loop
     def receive_loop(self):
         while True:
 
@@ -121,6 +122,7 @@ class Xbee_chaining_bot(XbRssi):
         else:
             return 0
 
+    # sending signals
     def send_signal(self, msg):
         self.sendMessage = msg
         self.sendingCommand = True
@@ -128,7 +130,8 @@ class Xbee_chaining_bot(XbRssi):
             print self.data
             print 'waiting_ack_for_'+msg
             time.sleep(3)
-
+    
+    # sending different commands
     def send_arrival_signal(self):
         self.send_signal('ARRIVAL')
 
@@ -150,6 +153,7 @@ class Xbee_chaining_bot(XbRssi):
     def send_change_channel_signal(self, channel):
         self.send_signal('CHANGE_CHANNEL:'+channel)
 
+    # ascend/descend ending signals
     def end_gradient_ascend(self):
         self.ascend = False
         self.send_arrival_signal()
@@ -158,6 +162,7 @@ class Xbee_chaining_bot(XbRssi):
         self.descend = False
         self.send_stop_descend_signal()
 
+    # bot chaining setup
     def set_predecessor(self, msg):
         if (self.predecessor == 0):
             self.predecessor = int(self.get_sender_id(msg))
