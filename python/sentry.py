@@ -19,6 +19,6 @@ if __name__ == '__main__':
             if xb.transmit == True:
                 xb.transmit_rssi()
                 print 'Transmitting ' + str(xb.sendMessage)
-	       else:
+	        else:
                 print 'Sentry Mode'
                 time.sleep(3)

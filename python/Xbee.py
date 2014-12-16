@@ -17,6 +17,7 @@ class XbRssi(object):
         self.updateTransmitThread.daemon = True
         self.updateReceiveThread = threading.Thread(target=self.receive_loop)
         self.updateReceiveThread.daemon = True
+        self.transmit_peroid = 0.01     # in second
 
         self.response = 0
         self.rssi = 0
@@ -38,7 +39,6 @@ class XbRssi(object):
     def transmit_loop(self):
         while True:
             self.transmit_rssi()
-            time.sleep(.2) # need to be adjusted??
 
     def receive_loop(self):
         while True:
@@ -58,7 +58,7 @@ class XbRssi(object):
             #print "Sending Msg:" + msg
             self.xbee.tx(dest_addr='\xFF\xFF', data = msg)
             self.pktNum = self.pktNum + 1
-            time.sleep(.01)
+            time.sleep(self.transmit_peroid)
         else:
             time.sleep(5)
 
@@ -79,7 +79,7 @@ class XbRssi(object):
                 index_list.append(index)
                 i = i + 1
 
-            time.sleep(.01)
+            time.sleep(self.transmit_peroid)
 
         return rssi_list
 

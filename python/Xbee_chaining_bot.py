@@ -33,14 +33,12 @@ class Xbee_chaining_bot(XbRssi):
             data = self.data
             self.cmdHist.append(data)
             msg =  self.get_command(self.data)
-            print msg
             print self.cmdHist
             if msg.startswith('TRANSMIT_START'):
-                if (self.predecessor == self.get_sender_id(msg)):
+                if (int(self.predecessor) == int(self.get_sender_id(data))):
                     self.transmit = True
                     self.sendingCommand = True
-                    #print "BUG"
-                    self.cmdList.append('ASCEND_START')
+                    self.sendMessage = 'ACK_TRANSMIT_START'
 
             elif msg.startswith('TRANSMIT_STOP'):
                 print 'Setting transmit flag to false'
