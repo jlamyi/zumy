@@ -63,10 +63,9 @@ class Xbee_chaining_bot(XbRssi):
                     self.successor = self.get_sender_id(msg)
                     print 'Successor is set to'+str(self.successor)
                     self.cmdList.append('SET_PREDECESSOR')
-                else:
-                    self.cmdList.append('TRANSMIT_START')
 
                 self.cmdList.append('ASCEND_START')
+                self.cmdList.append('TRANSMIT_START')
 
             elif msg.startswith('DESCENDED'):
                 self.sendingCommand = True
