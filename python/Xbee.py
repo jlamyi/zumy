@@ -1,4 +1,4 @@
-
+            
 import time, threading, serial, zc_id
 from xbee import XBee
 from numpy import *
@@ -59,7 +59,7 @@ class XbRssi:
             #print "Sending Msg:" + msg
             self.xbee.tx(dest_addr='\xFF\xFF', data = msg)
             self.pktNum = self.pktNum + 1
-            time.sleep(.1)
+            time.sleep(.01)
         else:
             time.sleep(5)
 

@@ -37,7 +37,7 @@ class Xbee_chaining_bot(XbRssi):
                 if (self.predecessor == self.get_sender_id(msg)):
                     self.transmit = True
                     self.sendingCommand = True
-                    print "BUG"
+                    #print "BUG"
                     self.cmdList.append('ASCEND_START')
 
             elif msg.startswith('TRANSMIT_STOP'):
@@ -67,6 +67,10 @@ class Xbee_chaining_bot(XbRssi):
                     self.cmdList.append('TRANSMIT_START')
 
                 self.cmdList.append('ASCEND_START')
+
+            elif msg.startswith('DESCENDED'):
+                self.sendingCommand = True
+                self.sendMessage = 'ACK_DESCENDED'
 
             elif msg.startswith('SET_PRED'):
                 print 'in set pred'
@@ -128,6 +132,9 @@ class Xbee_chaining_bot(XbRssi):
     def send_arrival_signal(self):
         self.send_signal('ARRIVAL')
 
+    def send_stop_descend_signal(self):
+        self.send_signal('DESCENDED')
+
     def send_start_transmit_signal(self):
         self.send_signal('TRANSMIT_START')
 
@@ -140,12 +147,16 @@ class Xbee_chaining_bot(XbRssi):
     def send_start_ascend_signal(self):
         self.send_signal('ASCEND_START')
 
-    def send_change_channel_signal(self):
-        self.send_signal('CHANGE_CHANNEL')
+    def send_change_channel_signal(self, channel):
+        self.send_signal('CHANGE_CHANNEL:'+channel)
 
     def end_gradient_ascend(self):
         self.ascend = False
         self.send_arrival_signal()
+
+    def end_gradient_descend(self):
+        self.descend = False
+        self.send_stop_descend_signal()
 
     def set_predecessor(self, msg):
         if (self.predecessor == 0):
