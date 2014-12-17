@@ -13,18 +13,18 @@ class GDscent_multiBot(GDscent):
         self.counter = 0
 
         self.connections = []
-        self.single_stop_rssi = -40
-        self.stop_rssi = -40
+        self.single_stop_rssi = -50
+        self.stop_rssi = -50
 
         self.lastRSSI = 9999
         self.newRSSI = 0
         self.startRSSI = 0
         self.endRSSI = 0
 
-    '''
+    
     def drive_time_function(self):
-        return (abs(self.lastRSSI)-40)*0.05 + 0.2
-
+        return (abs(self.lastRSSI)-40)*0.05 + 0.4
+    '''
     def stage_benefit(self):
         return self.counter*0.3
     '''
