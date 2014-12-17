@@ -149,6 +149,24 @@ class XbRssi(object):
             except:
                 return 0
 
+    def trim_packet(self, msg):
+        if msg == 0:
+            return 'NO_INDEX'
+        else:
+            index_end_index = msg.index('-')
+            return msg[index_end_index+1:]
+
+    def get_command_in_ack(self, msg):
+        try:
+            if msg == 0:
+                return 'NO_COMMAND_IN_STOP_ACK'
+            else:
+                cmd_start_index = msg.index('=')
+                cmd_end_index = msg.index(':')
+
+                return msg[cmd_start_index+1:cmd_end_index ]
+        except:
+            return ''
     # start threading
     def start(self):
         self.updateTransmitThread.start()
