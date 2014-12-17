@@ -134,6 +134,21 @@ class XbRssi(object):
             cmd_start_index = msg.index('~')
             return msg[cmd_start_index+1:]
 
+    def get_intended_recipient(self, msg):
+        if msg == 0:
+             return 'NO_RECIPIENT'
+        else:
+            try:
+                recipient_start_index = msg.index(':')
+            
+                recipient = msg[recipient_start_index+1:]
+                if (len(msg[recipient_start_index+1:]) == 0):
+                    return 0
+                else:
+                    return msg[cmd_start_index+1:]
+            except:
+                return 0
+
     # start threading
     def start(self):
         self.updateTransmitThread.start()

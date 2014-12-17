@@ -30,92 +30,95 @@ class Xbee_chaining_bot(XbRssi):
 
     def decode_msg(self):
         if (self.response != 0):
-            data = self.data
-            self.cmdHist.append(data)
+            data = self.data            
             msg =  self.get_command(self.data)
-            print self.cmdHist
-            if msg.startswith('TRANSMIT_START'):
-                if (int(self.predecessor) == int(self.get_sender_id(data))):
-                    self.transmit = True
+            recipient = self.get_intended_recipient(self.data)
+            sender = int(self.get_sender_id(data))
+            if (recipient == int(self.rid) or recipient == 0):
+                print self.cmdHist
+                self.cmdHist.append(data)
+                if msg.startswith('TRANSMIT_START'):
+                    if (int(self.predecessor) == int(self.get_sender_id(data))):
+                        self.transmit = True
+                        self.sendingCommand = True
+                        self.sendMessage = 'ACK_TRANSMIT_START:'+ str(sender)
+
+                elif msg.startswith('TRANSMIT_STOP'):
+                    print 'Setting transmit flag to false'
+                    self.transmit = False 
+
+                elif msg.startswith('ASCEND_START'):
+                    self.ascend = True
                     self.sendingCommand = True
-                    self.sendMessage = 'ACK_TRANSMIT_START'
+                    self.sendMessage = 'ACK_ASCEND_START:'+ str(sender)
 
-            elif msg.startswith('TRANSMIT_STOP'):
-                print 'Setting transmit flag to false'
-                self.transmit = False 
+                elif msg.startswith('DESCEND_START'):
+                    self.descend = True
+                    self.sendingCommand = True
+                    self.sendMessage = 'ACK_DESCEND_START:'+ str(sender)
 
-            elif msg.startswith('ASCEND_START'):
-                self.ascend = True
-                self.sendingCommand = True
-                self.sendMessage = 'ACK_ASCEND_START'
+                elif msg.startswith('ARRIVAL'):
+                    self.sendingCommand = True
+                    self.sendMessage = 'ACK_ARRIVAL:'+ str(sender)
+                    self.goingSentry = True
+                    
+                    if (self.successor == 0):
+                        self.successor = self.get_sender_id(msg)
+                        print 'Successor is set to'+str(self.successor)
+                        self.cmdList.append('SET_PREDECESSOR')
 
-            elif msg.startswith('DESCEND_START'):
-                self.descend = True
-                self.sendingCommand = True
-                self.sendMessage = 'ACK_DESCEND_START'
+                    self.cmdList.append('ASCEND_START')
+                    self.cmdList.append('TRANSMIT_START')
 
-            elif msg.startswith('ARRIVAL'):
-                self.sendingCommand = True
-                self.sendMessage = 'ACK_ARRIVAL'
-                self.goingSentry = True
-                
-                if (self.successor == 0):
-                    self.successor = self.get_sender_id(msg)
-                    print 'Successor is set to'+str(self.successor)
-                    self.cmdList.append('SET_PREDECESSOR')
+                elif msg.startswith('DESCENDED'):
+                    self.sendingCommand = True
+                    self.sendMessage = 'ACK_DESCENDED:'+ str(sender)
 
-                self.cmdList.append('ASCEND_START')
-                self.cmdList.append('TRANSMIT_START')
+                elif msg.startswith('SET_PRED'):
+                    print 'in set pred'
+                    self.set_predecessor(data)
+                    self.sendMessage = 'ACK_SET_PREDECESSOR:'+ str(sender)
+                    self.sendingCommand = True
 
-            elif msg.startswith('DESCENDED'):
-                self.sendingCommand = True
-                self.sendMessage = 'ACK_DESCENDED'
+                elif msg.startswith('STOP_ACK'):
+                    self.sendingCommand = False
+                    self.sendMessage = ''
 
-            elif msg.startswith('SET_PRED'):
-                print 'in set pred'
-                self.set_predecessor(data)
-                self.sendMessage = 'ACK_SET_PREDECESSOR'
-                self.sendingCommand = True
+                elif msg.startswith('ACK'):
+                    self.sendingCommand = True
+                    self.sendMessage = 'STOP_ACK:'+ str(sender)
+                    self.startCommandPkt = self.pktNum
+                    
+                else:
+                    if self.sendMessage.startswith('STOP_ACK'):
+                        if self.pktNum > self.startCommandPkt+2:
+                            print "End cycle"
+                            self.sendingCommand = False
+                            self.sendMessage = ''
 
-            elif msg.startswith('STOP_ACK'):
-                self.sendingCommand = False
-                self.sendMessage = ''
+                    if (len(self.sendMessage) == 0 and len(msg) == 0):
+                        print "regular transmission"
+                        if self.sendingCommand == False:
 
-            elif msg.startswith('ACK'):
-                self.sendingCommand = True
-                self.sendMessage = 'STOP_ACK'  
-                self.startCommandPkt = self.pktNum
-                
-            else:
-                if self.sendMessage.startswith('STOP_ACK'):
-                    if self.pktNum > self.startCommandPkt+2:
-                        print "End cycle"
-                        self.sendingCommand = False
-                        self.sendMessage = ''
-
-                if (len(self.sendMessage) == 0 and len(msg) == 0):
-                    print "regular transmission"
-                    if self.sendingCommand == False:
-
-                        safe = False
-                        if (self.safeModeCounter == 0):
-                            print 'set safe counter'
-                            print self.cmdList
-                            self.safeModeCounter = self.pktNum
-                        else:
-                            if (int(self.pktNum) - self.safeModeCounter) > 3: 
-                                print 'safe for next command'
-                                safe = True
-                                self.safeModeCounter = 0
-                        if (safe):
-                            if len(self.cmdList):
-                                print "COMMAND LIST FUNCTION"
+                            safe = False
+                            if (self.safeModeCounter == 0):
+                                print 'set safe counter'
                                 print self.cmdList
-                                self.sendMessage = self.cmdList.pop()
-                                self.sendingCommand = True
+                                self.safeModeCounter = self.pktNum
                             else:
-                                if self.goingSentry == True:
-                                    self.transmit = False
+                                if (int(self.pktNum) - self.safeModeCounter) > 3: 
+                                    print 'safe for next command'
+                                    safe = True
+                                    self.safeModeCounter = 0
+                            if (safe):
+                                if len(self.cmdList):
+                                    print "COMMAND LIST FUNCTION"
+                                    print self.cmdList
+                                    self.sendMessage = self.cmdList.pop()
+                                    self.sendingCommand = True
+                                else:
+                                    if self.goingSentry == True:
+                                        self.transmit = False
 
         else:
             return 0
