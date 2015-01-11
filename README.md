@@ -34,15 +34,15 @@ https://wiki.eecs.berkeley.edu/biomimetics/Main/Zumy?action=download&upname=zumy
 
     * One to one descent
 
-        ```
-        python GDscent.py
-        ```
+      ```
+      python GDscent.py
+      ```
 
     * One to multiple descent
 
-         ```
-         python GDscent_multiBot.py
-         ```
+      ```
+      python GDscent_multiBot.py
+      ```
 
 ## Reference 
 
