@@ -1,5 +1,5 @@
 # zumy
-Zumy is a small robot running linux using Pololu's Zumo robot chassis.
+Zumy is a small robot running linux using Pololu's Zumo robot chassis. This source code are algorithms based on zumy driver codes: https://github.com/andrewjchen/zumy
 
 ## Getting Started
 * [Ground Station Setup](GroundStationSetup.md)
@@ -15,3 +15,30 @@ https://wiki.eecs.berkeley.edu/biomimetics/Main/Zumy?action=download&upname=zumy
 ## For Maintainers
 * [ODROID Imaging and Setup](RobotCodeSetup.md): For image maintainers
 * [ODROID Image Saving](odroid_image_saving.md): Saving master images
+
+## Run
+
+cd ~/zumy/python
+
+* Gradient ascend algorithm
+
+python GAscent_beta.py
+
+* Gradient descend algorithm
+
+One to one descent
+
+python GDscent.py
+
+One to multiple descent
+
+python GDscent_multiBot.py
+
+## Reference 
+
+https://github.com/andrewjchen/zumy
+
+
+
+
+
