@@ -20,11 +20,11 @@ https://wiki.eecs.berkeley.edu/biomimetics/Main/Zumy?action=download&upname=zumy
 
 cd ~/zumy/python
 
-* Gradient ascend algorithm
+Gradient ascend algorithm:
 
 python GAscent_beta.py
 
-* Gradient descend algorithm
+Gradient descend algorithm:
 
 One to one descent
 
