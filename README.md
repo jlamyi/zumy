@@ -18,21 +18,31 @@ https://wiki.eecs.berkeley.edu/biomimetics/Main/Zumy?action=download&upname=zumy
 
 ## Run
 
-          cd ~/zumy/python
+* Get under python repository: 
+
+  ```
+  cd ~/zumy/python
+  ```
 
 * Gradient ascend algorithm:
 
-          python GAscent_beta.py
+   ```
+   GAscent_beta.py
+   ```
 
 * Gradient descend algorithm:
 
     * One to one descent
 
+        ```
         python GDscent.py
+        ```
 
     * One to multiple descent
 
+         ```
          python GDscent_multiBot.py
+         ```
 
 ## Reference 
 
