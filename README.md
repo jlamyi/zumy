@@ -16,7 +16,7 @@ https://wiki.eecs.berkeley.edu/biomimetics/Main/Zumy?action=download&upname=zumy
 * [ODROID Imaging and Setup](RobotCodeSetup.md): For image maintainers
 * [ODROID Image Saving](odroid_image_saving.md): Saving master images
 
-## Run
+## Usage
 
 * Get under python repository: 
 
