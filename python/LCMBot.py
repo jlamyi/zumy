@@ -52,6 +52,6 @@ class LCMBot:
 
 if __name__=='__main__':
 	r0 = LCMBot('/01/base_cmd')
-	r0.drive(.1,.1)
+	r0.drive(.9,.9)
 	time.sleep(1)
 	r0.drive(0,0)
